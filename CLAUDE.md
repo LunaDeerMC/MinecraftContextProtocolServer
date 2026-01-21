@@ -62,19 +62,27 @@ ModelContextProtocolAgent/
     └── src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/
         ├── ModelContextProtocolAgent.java    # Main plugin class
         ├── Configuration.java                # Static config class
-        └── infrastructure/
-            ├── configuration/                # YAML config management system
-            │   ├── ConfigurationManager.java # Reflection-based YAML loader/saver
-            │   ├── ConfigurationFile.java    # Base for config classes
-            │   ├── ConfigurationPart.java    # Nested config sections
-            │   ├── Comment/Comments.java     # Inline YAML comments
-            │   ├── Headers.java              # File header comments
-            │   ├── HandleManually.java       # Skip field annotation
-            │   ├── PreProcess.java           # Pre-load hook
-            │   └── PostProcess.java          # Post-load hook
-            ├── scheduler/                     # Paper/Spigot task abstraction
-            ├── XLogger.java                  # Debug/info/warn/error logging
-            └── Notification.java             # Player/Console messaging
+        ├── infrastructure/
+        │   ├── configuration/                # YAML config management system
+        │   │   ├── ConfigurationManager.java # Reflection-based YAML loader/saver
+        │   │   ├── ConfigurationFile.java    # Base for config classes
+        │   │   ├── ConfigurationPart.java    # Nested config sections
+        │   │   ├── Comment/Comments.java     # Inline YAML comments
+        │   │   ├── Headers.java              # File header comments
+        │   │   ├── HandleManually.java       # Skip field annotation
+        │   │   ├── PreProcess.java           # Pre-load hook
+        │   │   └── PostProcess.java          # Post-load hook
+        │   ├── scheduler/                     # Paper/Spigot task abstraction
+        │   ├── XLogger.java                  # Debug/info/warn/error logging
+        │   └── Notification.java             # Player/Console messaging
+        └── communication/                     # WebSocket server & message handling
+            ├── server/                        # AgentWebSocketServer
+            ├── session/                       # SessionManager, GatewaySession
+            ├── auth/                          # AuthHandler, AuthResult
+            ├── heartbeat/                     # HeartbeatHandler
+            ├── codec/                         # MessageCodec
+            ├── router/                        # MessageRouter
+            └── message/                       # MCP message types
 ```
 
 ### Versioning System
@@ -171,38 +179,60 @@ emitter.emit("player.join", Map.of("player", playerName));
 
 ### Main Components
 
-1. **ModelContextProtocolAgent** (Main Plugin Class)
+1. **ModelContextProtocolAgent** ([core/src/main/java/.../ModelContextProtocolAgent.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/ModelContextProtocolAgent.java))
    - Entry point for plugin lifecycle
    - Initializes infrastructure (Logger, Scheduler, Notification)
    - Loads configuration on enable
+   - Starts WebSocket server
 
-2. **McpProviderRegistry** (SDK Interface)
+2. **AgentWebSocketServer** ([core/src/main/java/.../communication/server/AgentWebSocketServer.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/server/AgentWebSocketServer.java))
+   - HTTP-based WebSocket server using `com.sun.net.httpserver.HttpServer`
+   - Handles authentication via `AuthHandler`
+   - Manages sessions via `SessionManager`
+   - Routes messages via `MessageCodec`
+   - Implements heartbeat mechanism via `HeartbeatHandler`
+
+3. **Session Management** ([core/src/main/java/.../communication/session/](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/session/))
+   - `SessionManager` - Manages all Gateway connection sessions
+   - `GatewaySession` - Individual session with authentication state
+   - Session cleanup task removes stale connections
+   - Authentication timeout (30 seconds)
+
+4. **Message Protocol** ([core/src/main/java/.../communication/message/](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/message/))
+   - `AuthRequest` / `AuthResponse` - Authentication messages
+   - `HeartbeatMessage` / `HeartbeatAck` - Connection health
+   - `McpRequest` / `McpResponse` - Capability execution
+   - `McpEvent` - Event broadcasting
+
+5. **McpProviderRegistry** (SDK Interface)
    - Registers provider instances
    - Scans for `@McpContext`, `@McpAction`, `@McpEvent` annotations
    - Generates `CapabilityManifest` for each capability
    - Uses `SchemaGenerator` to create JSON schemas from Java types
 
-3. **ConfigurationManager**
+6. **ConfigurationManager** ([core/src/main/java/.../infrastructure/configuration/ConfigurationManager.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/infrastructure/configuration/ConfigurationManager.java))
    - Reflection-based YAML loader/saver
    - Supports nested configuration sections
    - Preserves comments in YAML files
    - Pre/post-process hooks for validation/transformation
 
-4. **Scheduler**
-   - Abstraction over Paper/Spigot task scheduling
-   - Supports Folia (async chunk operations)
+### WebSocket Protocol Flow
 
-5. **XLogger & Notification**
-   - Unified logging with debug levels
-   - Color-coded console output
-   - Player message formatting
+1. **Connection**: Client connects to `/ws` endpoint
+2. **Authentication**: Client sends `AuthRequest` with gateway ID and token
+3. **Capability Discovery**: Server responds with `AuthResponse` containing `CapabilityManifest` list
+4. **Heartbeat**: Server sends `HeartbeatMessage` periodically, client responds with `HeartbeatAck`
+5. **Request/Response**: Client sends `McpRequest`, server executes capability and returns `McpResponse`
+6. **Events**: Server broadcasts `McpEvent` to all authenticated sessions
 
-### WebSocket Server (Planned)
-The plugin will host a WebSocket server for Gateway communication:
-- Configurable host/port in `config.yml`
-- Authentication via `authToken`
-- Heartbeat mechanism for connection health
-- Capability discovery and execution protocol
+### Message Types
+
+- **type: "auth"** - Authentication request/response
+- **type: "heartbeat"** - Heartbeat ping
+- **type: "heartbeat_ack"** - Heartbeat pong
+- **type: "request"** - Capability execution request
+- **type: "response"** - Capability execution response
+- **type: "event"** - Server-sent event
 
 ## Testing
 
@@ -254,11 +284,14 @@ The plugin is marked as Folia-compatible in `plugin.yml`. The `Scheduler` abstra
 - Main config: `plugins/ModelContextProtocolAgent/config.yml`
 - Language files: `plugins/ModelContextProtocolAgent/languages/`
 
-## File References
+## Key Files Reference
 
 - **Main plugin class**: [core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/ModelContextProtocolAgent.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/ModelContextProtocolAgent.java)
 - **Configuration definition**: [core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/Configuration.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/Configuration.java)
 - **Config manager**: [core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/infrastructure/configuration/ConfigurationManager.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/infrastructure/configuration/ConfigurationManager.java)
+- **WebSocket server**: [core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/server/AgentWebSocketServer.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/server/AgentWebSocketServer.java)
+- **Session manager**: [core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/session/SessionManager.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/session/SessionManager.java)
 - **SDK main interface**: [sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/api/McpAgent.java](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/api/McpAgent.java)
 - **Annotations**: [sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/annotations/](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/annotations/)
 - **Capability manifest**: [sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/model/CapabilityManifest.java](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/model/CapabilityManifest.java)
+- **Schema generator**: [sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/util/SchemaGenerator.java](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/util/SchemaGenerator.java)
