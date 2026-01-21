@@ -38,6 +38,11 @@ Produces a `-full` JAR with bundled dependencies instead of `compileOnly`.
 ./gradlew :sdk:uploadToCentral -PcentralUsername=... -PcentralPassword=...
 ```
 
+### Run Tests
+```bash
+./gradlew test
+```
+
 ### Clean
 ```bash
 ./gradlew clean
@@ -68,21 +73,24 @@ ModelContextProtocolAgent/
         │   │   ├── ConfigurationFile.java    # Base for config classes
         │   │   ├── ConfigurationPart.java    # Nested config sections
         │   │   ├── Comment/Comments.java     # Inline YAML comments
-        │   │   ├── Headers.java              # File header comments
-        │   │   ├── HandleManually.java       # Skip field annotation
-        │   │   ├── PreProcess.java           # Pre-load hook
-        │   │   └── PostProcess.java          # Post-load hook
+        │   │   └── ...
         │   ├── scheduler/                     # Paper/Spigot task abstraction
         │   ├── XLogger.java                  # Debug/info/warn/error logging
         │   └── Notification.java             # Player/Console messaging
-        └── communication/                     # WebSocket server & message handling
-            ├── server/                        # AgentWebSocketServer
-            ├── session/                       # SessionManager, GatewaySession
-            ├── auth/                          # AuthHandler, AuthResult
-            ├── heartbeat/                     # HeartbeatHandler
-            ├── codec/                         # MessageCodec
-            ├── router/                        # MessageRouter
-            └── message/                       # MCP message types
+        ├── communication/                     # WebSocket server & message handling
+        │   ├── server/                        # AgentWebSocketServer
+        │   ├── session/                       # SessionManager, GatewaySession
+        │   ├── auth/                          # AuthHandler, AuthResult
+        │   ├── heartbeat/                     # HeartbeatHandler
+        │   ├── codec/                         # MessageCodec
+        │   ├── router/                        # MessageRouter
+        │   └── message/                       # MCP message types
+        └── core/                              # Core MCP functionality
+            ├── registry/                      # CapabilityRegistry, ProviderDescriptor
+            ├── execution/                     # ExecutionEngine, ExecutionInterceptor
+            ├── schema/                        # SchemaValidator
+            ├── permission/                    # PermissionChecker
+            └── audit/                         # AuditLogger, AuditEvent
 ```
 
 ### Versioning System
@@ -204,13 +212,20 @@ emitter.emit("player.join", Map.of("player", playerName));
    - `McpRequest` / `McpResponse` - Capability execution
    - `McpEvent` - Event broadcasting
 
-5. **McpProviderRegistry** (SDK Interface)
-   - Registers provider instances
+5. **CapabilityRegistry** ([core/src/main/java/.../core/registry/CapabilityRegistry.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/core/registry/CapabilityRegistry.java))
+   - Implements `McpProviderRegistry` interface
+   - Registers provider instances via reflection
    - Scans for `@McpContext`, `@McpAction`, `@McpEvent` annotations
    - Generates `CapabilityManifest` for each capability
    - Uses `SchemaGenerator` to create JSON schemas from Java types
 
-6. **ConfigurationManager** ([core/src/main/java/.../infrastructure/configuration/ConfigurationManager.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/infrastructure/configuration/ConfigurationManager.java))
+6. **ExecutionEngine** ([core/src/main/java/.../core/execution/ExecutionEngine.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/core/execution/ExecutionEngine.java))
+   - Processes capability invocation requests
+   - Uses interceptor chain for pre/post-processing
+   - Handles parameter conversion and method invocation
+   - Returns `McpResponse` with results or errors
+
+7. **ConfigurationManager** ([core/src/main/java/.../infrastructure/configuration/ConfigurationManager.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/infrastructure/configuration/ConfigurationManager.java))
    - Reflection-based YAML loader/saver
    - Supports nested configuration sections
    - Preserves comments in YAML files
@@ -247,25 +262,6 @@ Since this is a Minecraft plugin, integration tests require:
 2. Install on a Paper/Spigot server
 3. Test with actual Minecraft clients
 
-## Common Development Tasks
-
-### Adding a New Annotation to SDK
-1. Add annotation class in `sdk/src/main/java/.../annotations/`
-2. Update `CapabilityType` enum if needed
-3. Update `SchemaGenerator` to handle new annotation
-4. Update `CapabilityManifest` fields if needed
-5. Bump SDK version in `sdk/build.gradle.kts`
-
-### Adding a New Config Option
-1. Add field to `Configuration.java` or nested `ConfigurationPart`
-2. Add `@Comment` annotation for documentation
-3. Plugin will auto-generate config on next load
-
-### Debugging
-1. Set `debug: true` in `config.yml`
-2. Use `XLogger.debug()` for verbose logging
-3. Check console for `D |` prefixed debug messages
-
 ## Important Notes
 
 ### Java Version
@@ -273,7 +269,7 @@ Since this is a Minecraft plugin, integration tests require:
 - Minecraft 1.20.1+ compatible
 
 ### Dependencies
-- **Core**: Paper API 1.20.1, Adventure platform for Bukkit
+- **Core**: Paper API 1.20.1, Adventure platform for Bukkit, Gson
 - **SDK**: Paper API (compileOnly) for Bukkit types
 - **Build**: Shadow plugin for fat JAR, RunPaper for dev server
 
@@ -286,12 +282,14 @@ The plugin is marked as Folia-compatible in `plugin.yml`. The `Scheduler` abstra
 
 ## Key Files Reference
 
-- **Main plugin class**: [core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/ModelContextProtocolAgent.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/ModelContextProtocolAgent.java)
-- **Configuration definition**: [core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/Configuration.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/Configuration.java)
-- **Config manager**: [core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/infrastructure/configuration/ConfigurationManager.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/infrastructure/configuration/ConfigurationManager.java)
-- **WebSocket server**: [core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/server/AgentWebSocketServer.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/server/AgentWebSocketServer.java)
-- **Session manager**: [core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/session/SessionManager.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/session/SessionManager.java)
-- **SDK main interface**: [sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/api/McpAgent.java](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/api/McpAgent.java)
-- **Annotations**: [sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/annotations/](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/annotations/)
-- **Capability manifest**: [sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/model/CapabilityManifest.java](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/model/CapabilityManifest.java)
-- **Schema generator**: [sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/util/SchemaGenerator.java](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/util/SchemaGenerator.java)
+- **Main plugin class**: [core/src/main/java/.../ModelContextProtocolAgent.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/ModelContextProtocolAgent.java)
+- **Configuration definition**: [core/src/main/java/.../Configuration.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/Configuration.java)
+- **Config manager**: [core/src/main/java/.../infrastructure/configuration/ConfigurationManager.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/infrastructure/configuration/ConfigurationManager.java)
+- **WebSocket server**: [core/src/main/java/.../communication/server/AgentWebSocketServer.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/server/AgentWebSocketServer.java)
+- **Session manager**: [core/src/main/java/.../communication/session/SessionManager.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/session/SessionManager.java)
+- **Capability registry**: [core/src/main/java/.../core/registry/CapabilityRegistry.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/core/registry/CapabilityRegistry.java)
+- **Execution engine**: [core/src/main/java/.../core/execution/ExecutionEngine.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/core/execution/ExecutionEngine.java)
+- **SDK main interface**: [sdk/src/main/java/.../api/McpAgent.java](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/api/McpAgent.java)
+- **Annotations**: [sdk/src/main/java/.../annotations/](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/annotations/)
+- **Capability manifest**: [sdk/src/main/java/.../model/CapabilityManifest.java](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/model/CapabilityManifest.java)
+- **Schema generator**: [sdk/src/main/java/.../util/SchemaGenerator.java](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/util/SchemaGenerator.java)

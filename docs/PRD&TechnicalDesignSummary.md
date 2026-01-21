@@ -280,8 +280,9 @@
 * 玩家治理操作（Kick、Mute、Teleport）
 * 世界清实体、规则修改
 * 世界备份与恢复
-* 审计钩子与回滚支持
 * 与 Gateway 通信模块
+
+**NOTE**: Safety Layer（限流、快照、回滚、风险评估）已跳过，由 Gateway 统一保障安全
 
 ### Gateway MVP
 
@@ -302,6 +303,7 @@
 * 完成 Agent 核心插件 + SDK
 * 完成 Gateway MCP 对接 + 权限 + 审计
 * 打通模型 → Gateway → Agent → Minecraft 执行链路
+* **NOTE**: Safety Layer 跳过，由 Gateway 保障安全
 
 ### Phase 2（平台化能力）
 
