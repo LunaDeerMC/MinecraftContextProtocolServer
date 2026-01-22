@@ -13,9 +13,9 @@ import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.XLogger;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.configuration.ConfigurationPart;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.scheduler.Scheduler;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.CapabilityManifest;
-import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
 import java.io.OutputStream;

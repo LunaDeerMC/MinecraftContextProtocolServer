@@ -11,11 +11,7 @@ import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.XLogger;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.configuration.ConfigurationManager;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.configuration.ConfigurationPart;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.scheduler.Scheduler;
-import cn.lunadeer.mc.modelContextProtocolAgent.provider.builtin.ChatProvider;
-import cn.lunadeer.mc.modelContextProtocolAgent.provider.builtin.EntityProvider;
-import cn.lunadeer.mc.modelContextProtocolAgent.provider.builtin.PlayerProvider;
-import cn.lunadeer.mc.modelContextProtocolAgent.provider.builtin.SystemProvider;
-import cn.lunadeer.mc.modelContextProtocolAgent.provider.builtin.WorldProvider;
+import cn.lunadeer.mc.modelContextProtocolAgent.provider.builtin.*;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.api.McpAgent;
 import org.bukkit.plugin.java.JavaPlugin;
 

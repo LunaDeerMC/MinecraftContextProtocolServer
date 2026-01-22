@@ -1,10 +1,10 @@
 package cn.lunadeer.mc.modelContextProtocolAgent.core.execution;
 
-import cn.lunadeer.mc.modelContextProtocolAgent.core.registry.CapabilityDescriptor;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.message.McpRequest;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.message.McpResponse;
-import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.RiskLevel;
+import cn.lunadeer.mc.modelContextProtocolAgent.core.registry.CapabilityDescriptor;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.CapabilityType;
+import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.RiskLevel;
 
 import java.util.HashMap;
 import java.util.Map;

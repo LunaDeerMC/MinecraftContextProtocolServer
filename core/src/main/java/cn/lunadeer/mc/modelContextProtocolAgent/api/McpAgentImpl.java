@@ -1,7 +1,6 @@
 package cn.lunadeer.mc.modelContextProtocolAgent.api;
 
 import cn.lunadeer.mc.modelContextProtocolAgent.core.registry.CapabilityRegistry;
-import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.XLogger;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.api.McpAgent;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.api.McpEventEmitter;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.api.McpProviderRegistry;
@@ -28,9 +27,9 @@ public class McpAgentImpl implements McpAgent {
      * Constructs a new McpAgentImpl.
      *
      * @param providerRegistry the provider registry
-     * @param eventEmitter the event emitter
-     * @param version the agent version
-     * @param agentId the agent ID
+     * @param eventEmitter     the event emitter
+     * @param version          the agent version
+     * @param agentId          the agent ID
      */
     public McpAgentImpl(
             CapabilityRegistry providerRegistry,

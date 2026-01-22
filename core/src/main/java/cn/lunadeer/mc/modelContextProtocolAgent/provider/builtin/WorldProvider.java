@@ -7,12 +7,7 @@ import cn.lunadeer.mc.modelContextProtocolAgentSDK.annotations.Param;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.exception.McpBusinessException;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.ErrorCode;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.RiskLevel;
-import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.SetTimeResult;
-import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.SetWeatherResult;
-import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.TpsResult;
-import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.WeatherResult;
-import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.WeatherType;
-import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.WorldTimeResult;
+import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.*;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 

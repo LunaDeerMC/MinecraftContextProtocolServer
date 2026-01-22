@@ -1,11 +1,7 @@
 package cn.lunadeer.mc.modelContextProtocolAgent.communication.message;
 
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.CapabilityManifest;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 
 import java.util.List;
 import java.util.Set;

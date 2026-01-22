@@ -4,7 +4,8 @@ import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.XLogger;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.exception.McpValidationException;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.ErrorCode;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Schema Validator for MCP capability parameters and return values.
