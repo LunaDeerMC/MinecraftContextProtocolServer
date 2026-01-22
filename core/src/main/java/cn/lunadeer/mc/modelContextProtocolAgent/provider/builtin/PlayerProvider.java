@@ -55,7 +55,7 @@ public class PlayerProvider {
         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
 
         if (pagination == null) {
-            pagination = new PaginationParam();
+            pagination = PaginationParam.createDefault();
         }
 
         List<PlayerInfo> playerInfos = new ArrayList<>();
@@ -65,9 +65,9 @@ public class PlayerProvider {
 
         // Apply pagination
         int total = playerInfos.size();
-        int pageSize = pagination.getPageSize();
+        int pageSize = pagination.pageSize() != null ? pagination.pageSize() : 20;
         int totalPages = (int) Math.ceil((double) total / pageSize);
-        int page = Math.min(pagination.getPage(), totalPages);
+        int page = Math.min(pagination.page() != null ? pagination.page() : 1, totalPages);
         int offset = pagination.getOffset();
 
         List<PlayerInfo> paginated = playerInfos.subList(
@@ -75,13 +75,7 @@ public class PlayerProvider {
             Math.min(offset + pageSize, total)
         );
 
-        PlayerListResult result = new PlayerListResult();
-        result.setPlayers(paginated);
-        result.setTotal(total);
-        result.setPage(page);
-        result.setPageSize(pageSize);
-        result.setTotalPages(totalPages);
-        return result;
+        return new PlayerListResult(paginated, total, page, pageSize, totalPages);
     }
 
     /**
@@ -153,11 +147,11 @@ public class PlayerProvider {
 
         boolean success = player.teleport(targetLocation);
 
-        TeleportResult result = new TeleportResult();
-        result.setSuccess(success);
-        result.setPreviousLocation(toLocationParam(previousLocation));
-        result.setNewLocation(location);
-        return result;
+        return new TeleportResult(
+            success,
+            toLocationParam(previousLocation),
+            location
+        );
     }
 
     /**
@@ -192,11 +186,7 @@ public class PlayerProvider {
         String kickReason = reason != null ? reason : "Kicked by administrator";
         player.kick(net.kyori.adventure.text.Component.text(kickReason));
 
-        KickResult result = new KickResult();
-        result.setSuccess(true);
-        result.setPlayerName(playerName);
-        result.setReason(kickReason);
-        return result;
+        return new KickResult(true, playerName, kickReason);
     }
 
     /**
@@ -228,23 +218,23 @@ public class PlayerProvider {
      * @return the player info
      */
     private PlayerInfo toPlayerInfo(Player player) {
-        PlayerInfo info = new PlayerInfo();
-        info.setName(player.getName());
-        info.setUuid(player.getUniqueId().toString());
-        info.setDisplayName(player.getDisplayName());
-        info.setLocation(toLocationParam(player.getLocation()));
-        info.setHealth(player.getHealth());
-        info.setMaxHealth(player.getMaxHealth());
-        info.setFoodLevel(player.getFoodLevel());
-        info.setLevel(player.getLevel());
-        info.setExp(player.getExp());
-        info.setGameMode(player.getGameMode().name());
-        info.setIsOp(player.isOp());
-        info.setIsFlying(player.isFlying());
-        info.setPing(player.getPing());
-        info.setFirstPlayed(Instant.ofEpochMilli(player.getFirstPlayed()));
-        info.setLastPlayed(Instant.ofEpochMilli(player.getLastPlayed()));
-        return info;
+        return new PlayerInfo(
+            player.getName(),
+            player.getUniqueId().toString(),
+            player.getDisplayName(),
+            toLocationParam(player.getLocation()),
+            player.getHealth(),
+            player.getMaxHealth(),
+            player.getFoodLevel(),
+            player.getLevel(),
+            player.getExp(),
+            player.getGameMode().name(),
+            player.isOp(),
+            player.isFlying(),
+            player.getPing(),
+            Instant.ofEpochMilli(player.getFirstPlayed()),
+            Instant.ofEpochMilli(player.getLastPlayed())
+        );
     }
 
     /**
@@ -257,7 +247,7 @@ public class PlayerProvider {
         if (location == null) {
             return null;
         }
-        return new LocationParam(
+        return LocationParam.create(
             location.getWorld() != null ? location.getWorld().getName() : null,
             location.getX(),
             location.getY(),
@@ -277,20 +267,20 @@ public class PlayerProvider {
         if (locationParam == null) {
             return null;
         }
-        org.bukkit.World world = Bukkit.getWorld(locationParam.getWorld());
+        org.bukkit.World world = Bukkit.getWorld(locationParam.world());
         if (world == null) {
             throw new McpBusinessException(
                 ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + locationParam.getWorld()
+                "World not found: " + locationParam.world()
             );
         }
         return new Location(
             world,
-            locationParam.getX(),
-            locationParam.getY(),
-            locationParam.getZ(),
-            locationParam.getYaw(),
-            locationParam.getPitch()
+            locationParam.x(),
+            locationParam.y(),
+            locationParam.z(),
+            locationParam.yaw(),
+            locationParam.pitch()
         );
     }
 }

@@ -55,13 +55,13 @@ public class WorldProvider {
         }
 
         long time = world.getTime();
-        WorldTimeResult result = new WorldTimeResult();
-        result.setWorldName(worldName);
-        result.setTime(time);
-        result.setFullTime(world.getFullTime());
-        result.setDay((int) (world.getFullTime() / 24000));
-        result.setPhase(time < 12000 ? WorldTimeResult.TimePhase.DAY : WorldTimeResult.TimePhase.NIGHT);
-        return result;
+        return new WorldTimeResult(
+            worldName,
+            time,
+            world.getFullTime(),
+            (int) (world.getFullTime() / 24000),
+            time < 12000 ? WorldTimeResult.TimePhase.DAY : WorldTimeResult.TimePhase.NIGHT
+        );
     }
 
     /**
@@ -101,11 +101,7 @@ public class WorldProvider {
         long previousTime = world.getTime();
         world.setTime(time);
 
-        SetTimeResult result = new SetTimeResult();
-        result.setSuccess(true);
-        result.setPreviousTime(previousTime);
-        result.setNewTime(time);
-        return result;
+        return new SetTimeResult(true, previousTime, time);
     }
 
     /**
@@ -144,11 +140,7 @@ public class WorldProvider {
             type = cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.WeatherType.CLEAR;
         }
 
-        WeatherResult result = new WeatherResult();
-        result.setWorldName(worldName);
-        result.setType(type);
-        result.setDuration(world.getWeatherDuration());
-        return result;
+        return new WeatherResult(worldName, type, world.getWeatherDuration());
     }
 
     /**
@@ -214,11 +206,7 @@ public class WorldProvider {
             world.setWeatherDuration(duration);
         }
 
-        SetWeatherResult result = new SetWeatherResult();
-        result.setSuccess(true);
-        result.setPreviousType(previousType);
-        result.setNewType(type);
-        return result;
+        return new SetWeatherResult(true, previousType, type);
     }
 
     /**
@@ -235,12 +223,12 @@ public class WorldProvider {
     )
     public TpsResult getTps() {
         double[] tps = Bukkit.getTPS();
-        TpsResult result = new TpsResult();
-        result.setTps1m(tps.length > 0 ? tps[0] : null);
-        result.setTps5m(tps.length > 1 ? tps[1] : null);
-        result.setTps15m(tps.length > 2 ? tps[2] : null);
-        result.setMspt(Bukkit.getAverageTickTime());
-        return result;
+        return new TpsResult(
+            tps.length > 0 ? tps[0] : null,
+            tps.length > 1 ? tps[1] : null,
+            tps.length > 2 ? tps[2] : null,
+            Bukkit.getAverageTickTime()
+        );
     }
 
     /**

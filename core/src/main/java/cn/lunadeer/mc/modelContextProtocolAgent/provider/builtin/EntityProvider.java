@@ -100,7 +100,7 @@ public class EntityProvider {
         // Apply pagination
         if (pagination != null) {
             int offset = pagination.getOffset();
-            int limit = pagination.getPageSize();
+            int limit = pagination.pageSize() != null ? pagination.pageSize() : 20;
             int from = Math.min(offset, result.size());
             int to = Math.min(offset + limit, result.size());
             result = result.subList(from, to);
@@ -193,20 +193,20 @@ public class EntityProvider {
         if (locationParam == null) {
             return null;
         }
-        org.bukkit.World world = Bukkit.getWorld(locationParam.getWorld());
+        org.bukkit.World world = Bukkit.getWorld(locationParam.world());
         if (world == null) {
             throw new McpBusinessException(
                 ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + locationParam.getWorld()
+                "World not found: " + locationParam.world()
             );
         }
         return new Location(
             world,
-            locationParam.getX(),
-            locationParam.getY(),
-            locationParam.getZ(),
-            locationParam.getYaw(),
-            locationParam.getPitch()
+            locationParam.x(),
+            locationParam.y(),
+            locationParam.z(),
+            locationParam.yaw(),
+            locationParam.pitch()
         );
     }
 }
