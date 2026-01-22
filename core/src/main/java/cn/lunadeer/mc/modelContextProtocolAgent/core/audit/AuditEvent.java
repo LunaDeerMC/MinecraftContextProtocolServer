@@ -12,95 +12,40 @@ import java.util.Map;
  * Contains all information about a capability execution for auditing purposes.
  * </p>
  *
+ * @param id           Unique event ID.
+ * @param timestamp    Timestamp when the event occurred.
+ * @param eventType    Type of audit event.
+ * @param capabilityId ID of the capability that was executed.
+ * @param caller       Caller information.
+ * @param request      Request data (sanitized, without sensitive information).
+ * @param response     Response data (sanitized, without sensitive information).
+ * @param riskLevel    Risk level of the capability.
+ * @param metadata     Additional metadata.
+ * @param success      Whether the execution was successful.
+ * @param error        Error information (if failed).
  * @author ZhangYuheng
  * @since 1.0.0
  */
-public class AuditEvent {
-
-    /**
-     * Unique event ID.
-     */
-    private final String id;
-
-    /**
-     * Timestamp when the event occurred.
-     */
-    private final Instant timestamp;
-
-    /**
-     * Type of audit event.
-     */
-    private final AuditEventType eventType;
-
-    /**
-     * ID of the capability that was executed.
-     */
-    private final String capabilityId;
-
-    /**
-     * Caller information.
-     */
-    private final CallerInfo caller;
-
-    /**
-     * Request data (sanitized, without sensitive information).
-     */
-    private final Map<String, Object> request;
-
-    /**
-     * Response data (sanitized, without sensitive information).
-     */
-    private final Object response;
-
-    /**
-     * Risk level of the capability.
-     */
-    private final RiskLevel riskLevel;
-
-    /**
-     * Additional metadata.
-     */
-    private final Map<String, Object> metadata;
-
-    /**
-     * Whether the execution was successful.
-     */
-    private final boolean success;
-
-    /**
-     * Error information (if failed).
-     */
-    private final String error;
+public record AuditEvent(String id, Instant timestamp, AuditEventType eventType, String capabilityId, CallerInfo caller,
+                         Map<String, Object> request, Object response, RiskLevel riskLevel,
+                         Map<String, Object> metadata, boolean success, String error) {
 
     /**
      * Constructs a new AuditEvent.
      *
-     * @param id the event ID
-     * @param timestamp the timestamp
-     * @param eventType the event type
+     * @param id           the event ID
+     * @param timestamp    the timestamp
+     * @param eventType    the event type
      * @param capabilityId the capability ID
-     * @param caller the caller info
-     * @param request the request data
-     * @param response the response data
-     * @param riskLevel the risk level
-     * @param metadata additional metadata
-     * @param success whether successful
-     * @param error error information
+     * @param caller       the caller info
+     * @param request      the request data
+     * @param response     the response data
+     * @param riskLevel    the risk level
+     * @param metadata     additional metadata
+     * @param success      whether successful
+     * @param error        error information
      */
-    public AuditEvent(String id, Instant timestamp, AuditEventType eventType, String capabilityId,
-                     CallerInfo caller, Map<String, Object> request, Object response,
-                     RiskLevel riskLevel, Map<String, Object> metadata, boolean success, String error) {
-        this.id = id;
-        this.timestamp = timestamp;
-        this.eventType = eventType;
-        this.capabilityId = capabilityId;
-        this.caller = caller;
-        this.request = request;
-        this.response = response;
-        this.riskLevel = riskLevel;
-        this.metadata = metadata;
-        this.success = success;
-        this.error = error;
+    public AuditEvent {
     }
 
     /**
@@ -108,7 +53,8 @@ public class AuditEvent {
      *
      * @return the event ID
      */
-    public String getId() {
+    @Override
+    public String id() {
         return id;
     }
 
@@ -117,7 +63,8 @@ public class AuditEvent {
      *
      * @return the timestamp
      */
-    public Instant getTimestamp() {
+    @Override
+    public Instant timestamp() {
         return timestamp;
     }
 
@@ -126,7 +73,8 @@ public class AuditEvent {
      *
      * @return the event type
      */
-    public AuditEventType getEventType() {
+    @Override
+    public AuditEventType eventType() {
         return eventType;
     }
 
@@ -135,7 +83,8 @@ public class AuditEvent {
      *
      * @return the capability ID
      */
-    public String getCapabilityId() {
+    @Override
+    public String capabilityId() {
         return capabilityId;
     }
 
@@ -144,7 +93,8 @@ public class AuditEvent {
      *
      * @return the caller info
      */
-    public CallerInfo getCaller() {
+    @Override
+    public CallerInfo caller() {
         return caller;
     }
 
@@ -153,7 +103,8 @@ public class AuditEvent {
      *
      * @return the request data
      */
-    public Map<String, Object> getRequest() {
+    @Override
+    public Map<String, Object> request() {
         return request;
     }
 
@@ -162,7 +113,8 @@ public class AuditEvent {
      *
      * @return the response data
      */
-    public Object getResponse() {
+    @Override
+    public Object response() {
         return response;
     }
 
@@ -171,7 +123,8 @@ public class AuditEvent {
      *
      * @return the risk level
      */
-    public RiskLevel getRiskLevel() {
+    @Override
+    public RiskLevel riskLevel() {
         return riskLevel;
     }
 
@@ -180,7 +133,8 @@ public class AuditEvent {
      *
      * @return the metadata
      */
-    public Map<String, Object> getMetadata() {
+    @Override
+    public Map<String, Object> metadata() {
         return metadata;
     }
 
@@ -189,7 +143,8 @@ public class AuditEvent {
      *
      * @return true if successful
      */
-    public boolean isSuccess() {
+    @Override
+    public boolean success() {
         return success;
     }
 
@@ -198,7 +153,8 @@ public class AuditEvent {
      *
      * @return the error
      */
-    public String getError() {
+    @Override
+    public String error() {
         return error;
     }
 

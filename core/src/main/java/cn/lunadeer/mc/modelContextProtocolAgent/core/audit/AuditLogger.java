@@ -219,15 +219,15 @@ public class AuditLogger implements ExecutionInterceptor {
         // For now, just log to console
         String logEntry = String.format(
                 "[AUDIT] %s | %s | %s | %s | %s | %s",
-                event.getTimestamp(),
-                event.getEventType(),
-                event.getCapabilityId(),
-                event.getCaller() != null ? event.getCaller().getId() : "unknown",
-                event.isSuccess() ? "SUCCESS" : "FAILED",
-                event.getError() != null ? event.getError() : ""
+                event.timestamp(),
+                event.eventType(),
+                event.capabilityId(),
+                event.caller() != null ? event.caller().getId() : "unknown",
+                event.success() ? "SUCCESS" : "FAILED",
+                event.error() != null ? event.error() : ""
         );
 
-        if (event.isSuccess()) {
+        if (event.success()) {
             XLogger.info(logEntry);
         } else {
             XLogger.warn(logEntry);
