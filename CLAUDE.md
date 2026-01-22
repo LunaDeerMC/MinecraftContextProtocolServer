@@ -193,11 +193,11 @@ emitter.emit("player.join", Map.of("player", playerName));
    - Loads configuration on enable
    - Starts WebSocket server
 
-2. **AgentWebSocketServer** ([core/src/main/java/.../communication/server/AgentWebSocketServer.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/server/AgentWebSocketServer.java))
-   - HTTP-based WebSocket server using `com.sun.net.httpserver.HttpServer`
+2. **AgentWebSocketServer** ([core/src/main/java/.../communication/AgentWebSocketServer.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/AgentWebSocketServer.java))
+   - WebSocket server using `org.java_websocket.server.WebSocketServer`
    - Handles authentication via `AuthHandler`
    - Manages sessions via `SessionManager`
-   - Routes messages via `MessageCodec`
+   - Routes messages via `MessageRouter`
    - Implements heartbeat mechanism via `HeartbeatHandler`
 
 3. **Session Management** ([core/src/main/java/.../communication/session/](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/session/))
@@ -233,7 +233,7 @@ emitter.emit("player.join", Map.of("player", playerName));
 
 ### WebSocket Protocol Flow
 
-1. **Connection**: Client connects to `/ws` endpoint
+1. **Connection**: Client connects to WebSocket endpoint
 2. **Authentication**: Client sends `AuthRequest` with gateway ID and token
 3. **Capability Discovery**: Server responds with `AuthResponse` containing `CapabilityManifest` list
 4. **Heartbeat**: Server sends `HeartbeatMessage` periodically, client responds with `HeartbeatAck`
@@ -269,7 +269,7 @@ Since this is a Minecraft plugin, integration tests require:
 - Minecraft 1.20.1+ compatible
 
 ### Dependencies
-- **Core**: Paper API 1.20.1, Adventure platform for Bukkit, Gson
+- **Core**: Paper API 1.20.1, Adventure platform for Bukkit, Java-WebSocket
 - **SDK**: Paper API (compileOnly) for Bukkit types
 - **Build**: Shadow plugin for fat JAR, RunPaper for dev server
 
@@ -285,7 +285,7 @@ The plugin is marked as Folia-compatible in `plugin.yml`. The `Scheduler` abstra
 - **Main plugin class**: [core/src/main/java/.../ModelContextProtocolAgent.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/ModelContextProtocolAgent.java)
 - **Configuration definition**: [core/src/main/java/.../Configuration.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/Configuration.java)
 - **Config manager**: [core/src/main/java/.../infrastructure/configuration/ConfigurationManager.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/infrastructure/configuration/ConfigurationManager.java)
-- **WebSocket server**: [core/src/main/java/.../communication/server/AgentWebSocketServer.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/server/AgentWebSocketServer.java)
+- **WebSocket server**: [core/src/main/java/.../communication/AgentWebSocketServer.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/AgentWebSocketServer.java)
 - **Session manager**: [core/src/main/java/.../communication/session/SessionManager.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/session/SessionManager.java)
 - **Capability registry**: [core/src/main/java/.../core/registry/CapabilityRegistry.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/core/registry/CapabilityRegistry.java)
 - **Execution engine**: [core/src/main/java/.../core/execution/ExecutionEngine.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/core/execution/ExecutionEngine.java)
