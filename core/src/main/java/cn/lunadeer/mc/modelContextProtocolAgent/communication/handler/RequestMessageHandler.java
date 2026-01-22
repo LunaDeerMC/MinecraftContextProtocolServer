@@ -5,9 +5,12 @@ import cn.lunadeer.mc.modelContextProtocolAgent.communication.message.McpMessage
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.message.McpRequest;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.message.McpResponse;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.session.GatewaySession;
+import cn.lunadeer.mc.modelContextProtocolAgent.core.execution.CallerInfo;
+import cn.lunadeer.mc.modelContextProtocolAgent.core.execution.ExecutionEngine;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.XLogger;
+import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.ErrorCode;
 
-import java.util.Map;
+import java.util.Collections;
 
 /**
  * Handles capability request messages from gateways.
@@ -18,9 +21,11 @@ import java.util.Map;
 public class RequestMessageHandler implements MessageHandler {
 
     private final MessageCodec messageCodec;
+    private final ExecutionEngine executionEngine;
 
-    public RequestMessageHandler(MessageCodec messageCodec) {
+    public RequestMessageHandler(MessageCodec messageCodec, ExecutionEngine executionEngine) {
         this.messageCodec = messageCodec;
+        this.executionEngine = executionEngine;
     }
 
     @Override
@@ -37,15 +42,29 @@ public class RequestMessageHandler implements MessageHandler {
             return;
         }
 
-        // TODO: Implement request handling with execution engine
-        // For now, send a placeholder response
-        McpResponse response = McpResponse.success(
-                request.getId(),
-                Map.of("message", "Request received (not yet implemented)")
-        ).build();
+        // Create CallerInfo from session
+        CallerInfo caller = new CallerInfo(
+                session.getGatewayId(),
+                session.getGatewayId(),
+                session.getPermissions(),
+                Collections.emptySet()
+        );
 
-        String jsonResponse = messageCodec.encode(response);
-        session.send(jsonResponse);
+        // Execute the capability using the execution engine
+        executionEngine.execute(request, caller).thenAccept(response -> {
+            String jsonResponse = messageCodec.encode(response);
+            session.send(jsonResponse);
+        }).exceptionally(ex -> {
+            // Handle execution errors
+            McpResponse errorResponse = McpResponse.error(
+                    request.getId(),
+                    ErrorCode.INTERNAL_ERROR,
+                    "Failed to execute capability: " + ex.getMessage()
+            ).build();
+            String jsonResponse = messageCodec.encode(errorResponse);
+            session.send(jsonResponse);
+            return null;
+        });
     }
 
     @Override

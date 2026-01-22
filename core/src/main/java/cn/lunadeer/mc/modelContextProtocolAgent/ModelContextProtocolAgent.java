@@ -4,6 +4,10 @@ import cn.lunadeer.mc.modelContextProtocolAgent.api.McpAgentImpl;
 import cn.lunadeer.mc.modelContextProtocolAgent.api.McpEventEmitterImpl;
 import cn.lunadeer.mc.modelContextProtocolAgent.api.command.McpCommandManager;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.AgentWebSocketServer;
+import cn.lunadeer.mc.modelContextProtocolAgent.core.audit.AuditLogger;
+import cn.lunadeer.mc.modelContextProtocolAgent.core.execution.ExecutionEngine;
+import cn.lunadeer.mc.modelContextProtocolAgent.core.execution.ExecutionInterceptor;
+import cn.lunadeer.mc.modelContextProtocolAgent.core.permission.PermissionChecker;
 import cn.lunadeer.mc.modelContextProtocolAgent.core.registry.CapabilityRegistry;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.I18n;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.Notification;
@@ -15,6 +19,9 @@ import cn.lunadeer.mc.modelContextProtocolAgent.provider.builtin.*;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.api.McpAgent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import java.io.File;
 
 public final class ModelContextProtocolAgent extends JavaPlugin {
@@ -24,6 +31,7 @@ public final class ModelContextProtocolAgent extends JavaPlugin {
     private CapabilityRegistry capabilityRegistry;
     private McpEventEmitterImpl eventEmitter;
     private McpCommandManager commandManager;
+    private ExecutionEngine executionEngine;
 
     public static class MainClassText extends ConfigurationPart {
         public String loadingConfig = "Loading configuration...";
@@ -97,7 +105,8 @@ public final class ModelContextProtocolAgent extends JavaPlugin {
             XLogger.info(I18n.mainClassText.websocketStarting);
             webSocketServer = new AgentWebSocketServer(
                     Configuration.websocketServer.host,
-                    Configuration.websocketServer.port
+                    Configuration.websocketServer.port,
+                    executionEngine
             );
             webSocketServer.start();
             XLogger.info(I18n.mainClassText.websocketStarted,
@@ -136,6 +145,14 @@ public final class ModelContextProtocolAgent extends JavaPlugin {
         capabilityRegistry = new CapabilityRegistry();
         eventEmitter = new McpEventEmitterImpl();
         mcpAgent = new McpAgentImpl(capabilityRegistry, eventEmitter, getDescription().getVersion(), Configuration.agentInfo.agentId);
+
+        // Create execution interceptors
+        List<ExecutionInterceptor> interceptors = new ArrayList<>();
+        interceptors.add(new PermissionChecker());
+        interceptors.add(new AuditLogger());
+
+        // Create execution engine
+        executionEngine = new ExecutionEngine(capabilityRegistry, interceptors);
 
         // Register the McpAgent service with Bukkit's service manager
         getServer().getServicesManager().register(McpAgent.class, mcpAgent, this, org.bukkit.plugin.ServicePriority.Normal);

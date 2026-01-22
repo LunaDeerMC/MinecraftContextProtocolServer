@@ -10,6 +10,7 @@ import cn.lunadeer.mc.modelContextProtocolAgent.communication.message.McpMessage
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.session.GatewaySession;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.session.SessionManager;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.session.WebSocketConnection;
+import cn.lunadeer.mc.modelContextProtocolAgent.core.execution.ExecutionEngine;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.I18n;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.XLogger;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.configuration.ConfigurationPart;
@@ -46,12 +47,14 @@ public class AgentWebSocketServer {
     private final MessageCodec messageCodec;
     private final MessageRouter messageRouter;
     private final HeartbeatHandler heartbeatHandler;
+    private final ExecutionEngine executionEngine;
     private WebSocketServerImpl webSocketServer;
     private boolean running = false;
 
-    public AgentWebSocketServer(String host, int port) {
+    public AgentWebSocketServer(String host, int port, ExecutionEngine executionEngine) {
         this.host = host;
         this.port = port;
+        this.executionEngine = executionEngine;
         this.sessionManager = new SessionManager(300); // 5 minutes timeout
         this.messageCodec = new MessageCodec();
         this.heartbeatHandler = new HeartbeatHandler(sessionManager);
@@ -66,7 +69,7 @@ public class AgentWebSocketServer {
         AuthHandler authHandler = new AuthHandler();
         messageRouter.registerHandler(new AuthMessageHandler(authHandler, sessionManager, messageCodec));
         messageRouter.registerHandler(new HeartbeatAckMessageHandler(heartbeatHandler));
-        messageRouter.registerHandler(new RequestMessageHandler(messageCodec));
+        messageRouter.registerHandler(new RequestMessageHandler(messageCodec, executionEngine));
     }
 
     /**
