@@ -9,6 +9,9 @@ public class Configuration extends ConfigurationFile {
     @Comment("Language code for messages. The supported language codes can be found in the 'languages' folder.")
     public static String language = "en_US";
 
+    @Comment("Unique identifier for this MCP Agent instance.")
+    public static String agentId = "mcp-agent-default";
+
     public static class WebsocketServer extends ConfigurationPart {
         @Comment("Host address for websocket server.")
         public String host = "127.0.0.1";

@@ -7,7 +7,6 @@ import cn.lunadeer.mc.modelContextProtocolAgent.communication.message.McpRequest
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.message.McpResponse;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.exception.McpException;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.exception.McpBusinessException;
-import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.CapabilityType;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.ErrorCode;
 
 import java.lang.reflect.Method;

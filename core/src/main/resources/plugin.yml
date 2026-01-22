@@ -4,3 +4,22 @@ main: cn.lunadeer.mc.modelContextProtocolAgent.ModelContextProtocolAgent
 api-version: '1.20'
 folia-supported: true
 libraries: [ ]
+
+commands:
+  mcp:
+    description: MCP Agent admin command
+    usage: /<command> <subcommand>
+    permission: mcp.admin
+    aliases: [mcagent]
+
+permissions:
+  mcp.admin:
+    description: MCP Agent admin permission
+    default: op
+    children:
+      mcp.admin.status: true
+      mcp.admin.reload: true
+      mcp.admin.providers: true
+      mcp.admin.capabilities: true
+      mcp.admin.sessions: true
+      mcp.admin.server: true

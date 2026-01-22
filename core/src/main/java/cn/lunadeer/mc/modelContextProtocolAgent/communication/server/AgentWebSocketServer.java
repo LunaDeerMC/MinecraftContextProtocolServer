@@ -136,6 +136,42 @@ public class AgentWebSocketServer {
     }
 
     /**
+     * Gets the session manager.
+     *
+     * @return the session manager
+     */
+    public SessionManager getSessionManager() {
+        return sessionManager;
+    }
+
+    /**
+     * Gets the host the server is listening on.
+     *
+     * @return the host
+     */
+    public String getHost() {
+        return host;
+    }
+
+    /**
+     * Gets the port the server is listening on.
+     *
+     * @return the port
+     */
+    public int getPort() {
+        return port;
+    }
+
+    /**
+     * Checks if the server is running.
+     *
+     * @return true if the server is running
+     */
+    public boolean isRunning() {
+        return running;
+    }
+
+    /**
      * Handles an incoming WebSocket connection.
      */
     private class WebSocketUpgradeHandler implements HttpHandler {

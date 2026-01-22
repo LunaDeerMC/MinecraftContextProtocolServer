@@ -1,12 +1,22 @@
 package cn.lunadeer.mc.modelContextProtocolAgent;
 
+import cn.lunadeer.mc.modelContextProtocolAgent.api.McpAgentImpl;
+import cn.lunadeer.mc.modelContextProtocolAgent.api.McpEventEmitterImpl;
+import cn.lunadeer.mc.modelContextProtocolAgent.api.command.McpCommandManager;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.server.AgentWebSocketServer;
+import cn.lunadeer.mc.modelContextProtocolAgent.core.registry.CapabilityRegistry;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.I18n;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.Notification;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.XLogger;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.configuration.ConfigurationManager;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.configuration.ConfigurationPart;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.scheduler.Scheduler;
+import cn.lunadeer.mc.modelContextProtocolAgent.provider.builtin.ChatProvider;
+import cn.lunadeer.mc.modelContextProtocolAgent.provider.builtin.EntityProvider;
+import cn.lunadeer.mc.modelContextProtocolAgent.provider.builtin.PlayerProvider;
+import cn.lunadeer.mc.modelContextProtocolAgent.provider.builtin.SystemProvider;
+import cn.lunadeer.mc.modelContextProtocolAgent.provider.builtin.WorldProvider;
+import cn.lunadeer.mc.modelContextProtocolAgentSDK.api.McpAgent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -14,6 +24,10 @@ import java.io.File;
 public final class ModelContextProtocolAgent extends JavaPlugin {
 
     private AgentWebSocketServer webSocketServer;
+    private McpAgentImpl mcpAgent;
+    private CapabilityRegistry capabilityRegistry;
+    private McpEventEmitterImpl eventEmitter;
+    private McpCommandManager commandManager;
 
     public static class MainClassText extends ConfigurationPart {
         public String loadingConfig = "Loading configuration...";
@@ -45,7 +59,10 @@ public final class ModelContextProtocolAgent extends JavaPlugin {
         XLogger.info("                                   |___/                ");
 
         loadConfiguration();
+        initializeProviderLayer();
+        registerBuiltInProviders();
         startWebSocketServer();
+        registerCommands();
     }
 
     @Override
@@ -79,7 +96,7 @@ public final class ModelContextProtocolAgent extends JavaPlugin {
     /**
      * Starts the WebSocket server.
      */
-    private void startWebSocketServer() {
+    public void startWebSocketServer() {
         try {
             XLogger.info(I18n.mainClassText.websocketStarting);
             webSocketServer = new AgentWebSocketServer(
@@ -99,7 +116,7 @@ public final class ModelContextProtocolAgent extends JavaPlugin {
     /**
      * Stops the WebSocket server.
      */
-    private void stopWebSocketServer() {
+    public void stopWebSocketServer() {
         if (webSocketServer != null) {
             XLogger.info(I18n.mainClassText.websocketStopping);
             webSocketServer.stop();
@@ -114,5 +131,73 @@ public final class ModelContextProtocolAgent extends JavaPlugin {
      */
     public AgentWebSocketServer getWebSocketServer() {
         return webSocketServer;
+    }
+
+    /**
+     * Initializes the provider layer.
+     */
+    private void initializeProviderLayer() {
+        capabilityRegistry = new CapabilityRegistry();
+        eventEmitter = new McpEventEmitterImpl();
+        mcpAgent = new McpAgentImpl(capabilityRegistry, eventEmitter, getDescription().getVersion(), Configuration.agentId);
+
+        // Register the McpAgent service with Bukkit's service manager
+        getServer().getServicesManager().register(McpAgent.class, mcpAgent, this, org.bukkit.plugin.ServicePriority.Normal);
+
+        XLogger.info("Provider layer initialized");
+    }
+
+    /**
+     * Registers built-in providers.
+     */
+    private void registerBuiltInProviders() {
+        try {
+            capabilityRegistry.register(new WorldProvider(), this);
+            capabilityRegistry.register(new PlayerProvider(), this);
+            capabilityRegistry.register(new EntityProvider(), this);
+            capabilityRegistry.register(new SystemProvider(), this);
+            capabilityRegistry.register(new ChatProvider(), this);
+
+            int totalCapabilities = capabilityRegistry.getCapabilities().size();
+            XLogger.info("Registered " + totalCapabilities + " built-in capabilities");
+        } catch (Exception e) {
+            XLogger.warn("Failed to register built-in providers");
+            XLogger.error(e);
+        }
+    }
+
+    /**
+     * Gets the MCP Agent implementation.
+     *
+     * @return the MCP Agent
+     */
+    public McpAgentImpl getMcpAgent() {
+        return mcpAgent;
+    }
+
+    /**
+     * Gets the capability registry.
+     *
+     * @return the capability registry
+     */
+    public CapabilityRegistry getCapabilityRegistry() {
+        return capabilityRegistry;
+    }
+
+    /**
+     * Gets the event emitter.
+     *
+     * @return the event emitter
+     */
+    public McpEventEmitterImpl getEventEmitter() {
+        return eventEmitter;
+    }
+
+    /**
+     * Registers admin commands.
+     */
+    private void registerCommands() {
+        commandManager = new McpCommandManager(this);
+        XLogger.info("Admin commands registered");
     }
 }
