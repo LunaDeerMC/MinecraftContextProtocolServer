@@ -1,11 +1,11 @@
 package cn.lunadeer.mc.modelContextProtocolAgent.infrastructure;
 
 import cn.lunadeer.mc.modelContextProtocolAgent.ModelContextProtocolAgent;
+import cn.lunadeer.mc.modelContextProtocolAgent.communication.AgentWebSocketServer;
+import cn.lunadeer.mc.modelContextProtocolAgent.communication.MessageRouter;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.auth.AuthHandler;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.codec.MessageCodec;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.heartbeat.HeartbeatHandler;
-import cn.lunadeer.mc.modelContextProtocolAgent.communication.router.MessageRouter;
-import cn.lunadeer.mc.modelContextProtocolAgent.communication.server.AgentWebSocketServer;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.session.GatewaySession;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.session.SessionManager;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.configuration.*;

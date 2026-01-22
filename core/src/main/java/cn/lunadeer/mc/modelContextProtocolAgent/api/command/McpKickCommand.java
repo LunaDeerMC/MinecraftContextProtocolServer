@@ -1,7 +1,7 @@
 package cn.lunadeer.mc.modelContextProtocolAgent.api.command;
 
 import cn.lunadeer.mc.modelContextProtocolAgent.ModelContextProtocolAgent;
-import cn.lunadeer.mc.modelContextProtocolAgent.communication.server.AgentWebSocketServer;
+import cn.lunadeer.mc.modelContextProtocolAgent.communication.AgentWebSocketServer;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.session.GatewaySession;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.session.SessionManager;
 import org.bukkit.command.CommandSender;

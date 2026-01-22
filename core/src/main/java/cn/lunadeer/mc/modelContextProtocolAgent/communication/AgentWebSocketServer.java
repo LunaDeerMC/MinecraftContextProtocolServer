@@ -1,11 +1,12 @@
-package cn.lunadeer.mc.modelContextProtocolAgent.communication.server;
+package cn.lunadeer.mc.modelContextProtocolAgent.communication;
 
-import cn.lunadeer.mc.modelContextProtocolAgent.Configuration;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.auth.AuthHandler;
-import cn.lunadeer.mc.modelContextProtocolAgent.communication.auth.AuthResult;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.codec.MessageCodec;
+import cn.lunadeer.mc.modelContextProtocolAgent.communication.handler.AuthMessageHandler;
+import cn.lunadeer.mc.modelContextProtocolAgent.communication.handler.HeartbeatAckMessageHandler;
+import cn.lunadeer.mc.modelContextProtocolAgent.communication.handler.RequestMessageHandler;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.heartbeat.HeartbeatHandler;
-import cn.lunadeer.mc.modelContextProtocolAgent.communication.message.*;
+import cn.lunadeer.mc.modelContextProtocolAgent.communication.message.McpMessage;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.session.GatewaySession;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.session.SessionManager;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.session.WebSocketConnection;
@@ -13,18 +14,13 @@ import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.I18n;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.XLogger;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.configuration.ConfigurationPart;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.scheduler.Scheduler;
-import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.CapabilityManifest;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import org.bukkit.Bukkit;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -43,16 +39,13 @@ public class AgentWebSocketServer {
         public String wsBroadcastFailed = "Failed to broadcast to gateway {0}: {1}";
         public String wsConnectionError = "Error handling connection from gateway {0}: {1}";
         public String wsMessageHandlingError = "Failed to handle message from gateway {0}: {1}";
-        public String wsGatewayReauthAttempt = "Gateway {0} attempted re-authentication";
-        public String wsUnauthRequestAttempt = "Unauthenticated gateway {0} attempted request";
-        public String wsUnknownMessageType = "Unknown message type from gateway {0}: {1}";
     }
 
     private final String host;
     private final int port;
     private final SessionManager sessionManager;
-    private final AuthHandler authHandler;
     private final MessageCodec messageCodec;
+    private final MessageRouter messageRouter;
     private final HeartbeatHandler heartbeatHandler;
     private HttpServer httpServer;
     private boolean running = false;
@@ -61,9 +54,20 @@ public class AgentWebSocketServer {
         this.host = host;
         this.port = port;
         this.sessionManager = new SessionManager(300); // 5 minutes timeout
-        this.authHandler = new AuthHandler();
         this.messageCodec = new MessageCodec();
         this.heartbeatHandler = new HeartbeatHandler(sessionManager);
+        this.messageRouter = new MessageRouter();
+        initializeMessageHandlers();
+    }
+
+    /**
+     * Initializes and registers all message handlers.
+     */
+    private void initializeMessageHandlers() {
+        AuthHandler authHandler = new AuthHandler();
+        messageRouter.registerHandler(new AuthMessageHandler(authHandler, sessionManager, messageCodec));
+        messageRouter.registerHandler(new HeartbeatAckMessageHandler(heartbeatHandler));
+        messageRouter.registerHandler(new RequestMessageHandler(messageCodec));
     }
 
     /**
@@ -240,112 +244,12 @@ public class AgentWebSocketServer {
             // Update last activity time
             session.setLastActivityAt(java.time.Instant.now());
 
-            // Route message based on type
-            switch (message.getType()) {
-                case "auth":
-                    handleAuth(session, (AuthRequest) message);
-                    break;
-                case "heartbeat_ack":
-                    heartbeatHandler.onHeartbeatAck(session.getId(), (HeartbeatAck) message);
-                    break;
-                case "request":
-                    handleRequest(session, (McpRequest) message);
-                    break;
-                default:
-                    XLogger.warn(I18n.agentWebSocketServerText.wsUnknownMessageType,
-                            session.getGatewayId(), message.getType());
-            }
+            // Route message to appropriate handler via MessageRouter
+            messageRouter.route(session, message);
         } catch (Exception e) {
             XLogger.error(I18n.agentWebSocketServerText.wsMessageHandlingError,
                     session.getGatewayId(), e.getMessage());
         }
-    }
-
-    /**
-     * Handles an authentication request (Gateway registration).
-     */
-    private void handleAuth(GatewaySession session, AuthRequest request) {
-        if (session.isAuthenticated()) {
-            XLogger.warn(I18n.agentWebSocketServerText.wsGatewayReauthAttempt, session.getGatewayId());
-            return;
-        }
-
-        AuthResult result = authHandler.authenticate(request.getGatewayId(), request.getToken());
-        if (result.isSuccess()) {
-            session.setGatewayId(request.getGatewayId());
-            session.setPermissions(result.getPermissions());
-            sessionManager.markAuthenticated(session);
-
-            // Send registration acknowledgment with agent info and capabilities
-            AuthResponse response = AuthResponse.builder()
-                    .id(UUID.randomUUID().toString())
-                    .success(true)
-                    .gatewayId(request.getGatewayId())
-                    .sessionId(session.getId())
-                    .agentInfo(new AuthResponse.AgentInfo(
-                            Configuration.agentInfo.agentId,
-                            Configuration.agentInfo.agentName,
-                            Configuration.agentInfo.agentVersion,
-                            Configuration.agentInfo.environment,
-                            new AuthResponse.ServerInfo(
-                                    Bukkit.getServer().getName(),
-                                    Bukkit.getServer().getWorldType(),
-                                    Bukkit.getServer().getVersion(),
-                                    Bukkit.getServer().getMaxPlayers()
-                            )
-                    ))
-                    .permissions(result.getPermissions())
-                    .capabilities(getCapabilityManifest())
-                    .config(new AuthResponse.Config(
-                            Configuration.websocketServer.heartbeatInterval,
-                            Configuration.websocketServer.reconnectDelay,
-                            Configuration.websocketServer.maxRetries
-                    ))
-                    .build();
-
-            send(session.getId(), response);
-        } else {
-            // Send authentication failure response
-            AuthResponse response = AuthResponse.builder()
-                    .id(UUID.randomUUID().toString())
-                    .success(false)
-                    .gatewayId(request.getGatewayId())
-                    .reason(result.getReason())
-                    .build();
-
-            send(session.getId(), response);
-
-            // Close the connection
-            session.close(4003, "Authentication failed");
-        }
-    }
-
-    /**
-     * Handles a capability request.
-     */
-    private void handleRequest(GatewaySession session, McpRequest request) {
-        if (!session.isAuthenticated()) {
-            XLogger.warn(I18n.agentWebSocketServerText.wsUnauthRequestAttempt, session.getGatewayId());
-            return;
-        }
-
-        // TODO: Implement request handling with execution engine
-        // For now, send a placeholder response
-        McpResponse response = McpResponse.success(
-                request.getId(),
-                Map.of("message", "Request received (not yet implemented)")
-        ).build();
-
-        send(session.getId(), response);
-    }
-
-    /**
-     * Gets the capability manifest for the agent.
-     * In a real implementation, this would come from the capability registry.
-     */
-    private List<CapabilityManifest> getCapabilityManifest() {
-        // Return empty list for now - this would be populated from the registry
-        return Collections.emptyList();
     }
 
     /**

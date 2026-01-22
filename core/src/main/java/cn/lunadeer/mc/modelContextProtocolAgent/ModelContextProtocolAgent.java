@@ -3,7 +3,7 @@ package cn.lunadeer.mc.modelContextProtocolAgent;
 import cn.lunadeer.mc.modelContextProtocolAgent.api.McpAgentImpl;
 import cn.lunadeer.mc.modelContextProtocolAgent.api.McpEventEmitterImpl;
 import cn.lunadeer.mc.modelContextProtocolAgent.api.command.McpCommandManager;
-import cn.lunadeer.mc.modelContextProtocolAgent.communication.server.AgentWebSocketServer;
+import cn.lunadeer.mc.modelContextProtocolAgent.communication.AgentWebSocketServer;
 import cn.lunadeer.mc.modelContextProtocolAgent.core.registry.CapabilityRegistry;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.I18n;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.Notification;

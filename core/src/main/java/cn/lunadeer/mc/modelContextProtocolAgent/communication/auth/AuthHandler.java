@@ -20,6 +20,7 @@ public class AuthHandler {
         public String authFailedInvalidToken = "Authentication failed for gateway {0}: Invalid token";
         public String gatewayPassedWhitelist = "Gateway {0} passed whitelist check";
         public String gatewayAuthenticated = "Gateway {0} authenticated successfully with {1} permissions";
+        public String gatewayReauthAttempt = "Gateway {0} attempted re-authentication";
     }
 
     /**
