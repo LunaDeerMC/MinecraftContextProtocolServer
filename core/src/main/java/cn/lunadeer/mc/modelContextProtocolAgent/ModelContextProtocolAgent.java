@@ -65,7 +65,7 @@ public final class ModelContextProtocolAgent extends JavaPlugin {
         loadConfiguration();
         initializeProviderLayer();
         registerBuiltInProviders();
-        startWebSocketServer();
+        if (Configuration.websocketServer.enableOnStart) startWebSocketServer();
         registerCommands();
     }
 
