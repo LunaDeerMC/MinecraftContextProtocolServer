@@ -102,22 +102,22 @@ public class CapabilityDescriptor {
     /**
      * Constructs a new CapabilityDescriptor.
      *
-     * @param id the capability ID
-     * @param version the capability version
-     * @param type the capability type
-     * @param manifest the capability manifest
-     * @param providerInstance the provider instance
-     * @param handlerMethod the handler method
-     * @param parameterSchema the parameter schema
-     * @param returnSchema the return schema
-     * @param riskLevel the risk level
-     * @param permissions the required permissions
+     * @param id                the capability ID
+     * @param version           the capability version
+     * @param type              the capability type
+     * @param manifest          the capability manifest
+     * @param providerInstance  the provider instance
+     * @param handlerMethod     the handler method
+     * @param parameterSchema   the parameter schema
+     * @param returnSchema      the return schema
+     * @param riskLevel         the risk level
+     * @param permissions       the required permissions
      * @param rollbackSupported whether rollback is supported
-     * @param snapshotRequired whether snapshot is required
-     * @param confirmRequired whether confirmation is required
-     * @param cacheable whether cacheable
-     * @param cacheTtl the cache TTL
-     * @param tags the capability tags
+     * @param snapshotRequired  whether snapshot is required
+     * @param confirmRequired   whether confirmation is required
+     * @param cacheable         whether cacheable
+     * @param cacheTtl          the cache TTL
+     * @param tags              the capability tags
      */
     public CapabilityDescriptor(
             String id,

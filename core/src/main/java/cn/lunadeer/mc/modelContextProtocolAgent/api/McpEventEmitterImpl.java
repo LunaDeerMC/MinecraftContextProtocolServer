@@ -62,13 +62,13 @@ public class McpEventEmitterImpl implements McpEventEmitter {
     @Override
     public Subscription subscribe(String eventId, SubscriptionFilter filter, String subscriberId) {
         SubscriptionImpl subscription = new SubscriptionImpl(
-            UUID.randomUUID().toString(),
-            eventId,
-            filter,
-            subscriberId,
-            eventData -> {
-                // Default callback - will be overridden by subscriber
-            }
+                UUID.randomUUID().toString(),
+                eventId,
+                filter,
+                subscriberId,
+                eventData -> {
+                    // Default callback - will be overridden by subscriber
+                }
         );
 
         subscriptions.computeIfAbsent(eventId, k -> new ArrayList<>()).add(subscription);

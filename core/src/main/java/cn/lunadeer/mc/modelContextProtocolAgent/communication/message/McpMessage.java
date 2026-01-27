@@ -54,6 +54,7 @@ public abstract class McpMessage {
 
     /**
      * Get the payload of this message.
+     *
      * @return the payload as JsonElement
      */
     public abstract JsonElement getPayload();

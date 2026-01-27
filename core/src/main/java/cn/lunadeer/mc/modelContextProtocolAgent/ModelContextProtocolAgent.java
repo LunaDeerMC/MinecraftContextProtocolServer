@@ -19,10 +19,9 @@ import cn.lunadeer.mc.modelContextProtocolAgent.provider.builtin.*;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.api.McpAgent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import java.io.File;
 
 public final class ModelContextProtocolAgent extends JavaPlugin {
 
@@ -49,7 +48,8 @@ public final class ModelContextProtocolAgent extends JavaPlugin {
         // Plugin startup logic
         instance = this;
         new Notification(this);
-        new XLogger(this); XLogger.setDebug(true);
+        new XLogger(this);
+        XLogger.setDebug(true);
         new Scheduler(this);
 
         // https://patorjk.com/software/taag/#p=display&f=Big&t=MCP-Agent&x=none&v=4&h=4&w=80&we=false

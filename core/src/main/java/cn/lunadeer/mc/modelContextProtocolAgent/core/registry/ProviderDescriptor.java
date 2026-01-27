@@ -48,11 +48,11 @@ public class ProviderDescriptor {
     /**
      * Constructs a new ProviderDescriptor.
      *
-     * @param id the provider ID
-     * @param name the provider name
-     * @param version the provider version
-     * @param instance the provider instance
-     * @param ownerPlugin the owning plugin
+     * @param id           the provider ID
+     * @param name         the provider name
+     * @param version      the provider version
+     * @param instance     the provider instance
+     * @param ownerPlugin  the owning plugin
      * @param capabilities the capabilities provided
      */
     public ProviderDescriptor(

@@ -88,26 +88,26 @@ public class McpResponse extends McpMessage {
 
     public static Builder success(String id, Object data) {
         return new Builder()
-            .id(id)
-            .success(true)
-            .data(data);
+                .id(id)
+                .success(true)
+                .data(data);
     }
 
     public static Builder error(String id, ErrorCode errorCode, String errorMessage) {
         return new Builder()
-            .id(id)
-            .success(false)
-            .errorCode(errorCode)
-            .errorMessage(errorMessage);
+                .id(id)
+                .success(false)
+                .errorCode(errorCode)
+                .errorMessage(errorMessage);
     }
 
     public static Builder error(String id, ErrorCode errorCode, String errorMessage, Map<String, Object> details) {
         return new Builder()
-            .id(id)
-            .success(false)
-            .errorCode(errorCode)
-            .errorMessage(errorMessage)
-            .details(details);
+                .id(id)
+                .success(false)
+                .errorCode(errorCode)
+                .errorMessage(errorMessage)
+                .details(details);
     }
 
     public static class Builder {

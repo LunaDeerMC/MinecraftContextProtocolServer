@@ -219,7 +219,7 @@ public class CapabilityRegistry implements McpProviderRegistry {
      * Scans a provider instance for capability methods.
      *
      * @param providerInstance the provider instance
-     * @param providerId the provider ID
+     * @param providerId       the provider ID
      * @return list of capability descriptors
      */
     private List<CapabilityDescriptor> scanCapabilities(Object providerInstance, String providerId) {
@@ -256,10 +256,10 @@ public class CapabilityRegistry implements McpProviderRegistry {
      * Creates a capability descriptor from an annotated method.
      *
      * @param providerInstance the provider instance
-     * @param providerId the provider ID
-     * @param method the handler method
-     * @param annotation the capability annotation
-     * @param type the capability type
+     * @param providerId       the provider ID
+     * @param method           the handler method
+     * @param annotation       the capability annotation
+     * @param type             the capability type
      * @return the capability descriptor
      */
     private CapabilityDescriptor createCapabilityDescriptor(

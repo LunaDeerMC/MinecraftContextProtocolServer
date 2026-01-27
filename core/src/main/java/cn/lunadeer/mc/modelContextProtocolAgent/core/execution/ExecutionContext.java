@@ -64,13 +64,13 @@ public class ExecutionContext {
     /**
      * Constructs a new ExecutionContext.
      *
-     * @param request the MCP request
+     * @param request    the MCP request
      * @param capability the capability descriptor
-     * @param caller the caller information
+     * @param caller     the caller information
      * @param parameters the parsed parameters
      */
     public ExecutionContext(McpRequest request, CapabilityDescriptor capability,
-                           CallerInfo caller, Map<String, Object> parameters) {
+                            CallerInfo caller, Map<String, Object> parameters) {
         this.request = request;
         this.capability = capability;
         this.caller = caller;
@@ -138,7 +138,7 @@ public class ExecutionContext {
      *
      * @param name the parameter name
      * @param type the expected type
-     * @param <T> the type parameter
+     * @param <T>  the type parameter
      * @return the parameter value, or null if not found or wrong type
      */
     @SuppressWarnings("unchecked")
@@ -162,7 +162,7 @@ public class ExecutionContext {
     /**
      * Sets a metadata value.
      *
-     * @param key the metadata key
+     * @param key   the metadata key
      * @param value the metadata value
      */
     public void setMetadata(String key, Object value) {

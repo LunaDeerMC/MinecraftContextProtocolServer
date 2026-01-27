@@ -20,10 +20,10 @@ import org.bukkit.entity.Player;
  * @since 1.0.0
  */
 @McpProvider(
-    id = "mcp-internal-chat",
-    name = "MCP Chat Provider",
-    version = "1.0.0",
-    description = "Built-in capabilities for Minecraft chat management"
+        id = "mcp-internal-chat",
+        name = "MCP Chat Provider",
+        version = "1.0.0",
+        description = "Built-in capabilities for Minecraft chat management"
 )
 public class ChatProvider {
 
@@ -31,31 +31,31 @@ public class ChatProvider {
      * Sends a message to a player.
      *
      * @param playerName the player name
-     * @param message the message to send
-     * @param color the color code (optional)
+     * @param message    the message to send
+     * @param color      the color code (optional)
      * @return true if successful
      */
     @McpAction(
-        id = "chat.send.player",
-        name = "Send Message to Player",
-        description = "Sends a message to a specific player",
-        risk = RiskLevel.LOW,
-        permissions = {"mcp.action.chat.send.player"},
-        tags = {"chat", "message", "send"}
+            id = "chat.send.player",
+            name = "Send Message to Player",
+            description = "Sends a message to a specific player",
+            risk = RiskLevel.LOW,
+            permissions = {"mcp.action.chat.send.player"},
+            tags = {"chat", "message", "send"}
     )
     public Boolean sendPlayerMessage(
-        @Param(name = "playerName", required = true, description = "Player name")
-        String playerName,
-        @Param(name = "message", required = true, description = "Message to send")
-        String message,
-        @Param(name = "color", description = "Color code (e.g., 'red', 'green', 'gold')")
-        String color
+            @Param(name = "playerName", required = true, description = "Player name")
+            String playerName,
+            @Param(name = "message", required = true, description = "Message to send")
+            String message,
+            @Param(name = "color", description = "Color code (e.g., 'red', 'green', 'gold')")
+            String color
     ) {
         Player player = Bukkit.getPlayer(playerName);
         if (player == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "Player not found or offline: " + playerName
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "Player not found or offline: " + playerName
             );
         }
 
@@ -68,22 +68,22 @@ public class ChatProvider {
      * Broadcasts a message to all players.
      *
      * @param message the message to broadcast
-     * @param color the color code (optional)
+     * @param color   the color code (optional)
      * @return true if successful
      */
     @McpAction(
-        id = "chat.broadcast",
-        name = "Broadcast Message",
-        description = "Broadcasts a message to all players",
-        risk = RiskLevel.MEDIUM,
-        permissions = {"mcp.action.chat.broadcast"},
-        tags = {"chat", "message", "broadcast"}
+            id = "chat.broadcast",
+            name = "Broadcast Message",
+            description = "Broadcasts a message to all players",
+            risk = RiskLevel.MEDIUM,
+            permissions = {"mcp.action.chat.broadcast"},
+            tags = {"chat", "message", "broadcast"}
     )
     public Boolean broadcastMessage(
-        @Param(name = "message", required = true, description = "Message to broadcast")
-        String message,
-        @Param(name = "color", description = "Color code (e.g., 'red', 'green', 'gold')")
-        String color
+            @Param(name = "message", required = true, description = "Message to broadcast")
+            String message,
+            @Param(name = "color", description = "Color code (e.g., 'red', 'green', 'gold')")
+            String color
     ) {
         String formattedMessage = formatMessage(message, color);
         Bukkit.broadcastMessage(formattedMessage);
@@ -94,28 +94,28 @@ public class ChatProvider {
      * Sends an action bar message to a player.
      *
      * @param playerName the player name
-     * @param message the message to send
+     * @param message    the message to send
      * @return true if successful
      */
     @McpAction(
-        id = "chat.send.actionbar",
-        name = "Send Action Bar Message",
-        description = "Sends an action bar message to a player",
-        risk = RiskLevel.LOW,
-        permissions = {"mcp.action.chat.send.actionbar"},
-        tags = {"chat", "message", "actionbar"}
+            id = "chat.send.actionbar",
+            name = "Send Action Bar Message",
+            description = "Sends an action bar message to a player",
+            risk = RiskLevel.LOW,
+            permissions = {"mcp.action.chat.send.actionbar"},
+            tags = {"chat", "message", "actionbar"}
     )
     public Boolean sendActionBarMessage(
-        @Param(name = "playerName", required = true, description = "Player name")
-        String playerName,
-        @Param(name = "message", required = true, description = "Message to send")
-        String message
+            @Param(name = "playerName", required = true, description = "Player name")
+            String playerName,
+            @Param(name = "message", required = true, description = "Message to send")
+            String message
     ) {
         Player player = Bukkit.getPlayer(playerName);
         if (player == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "Player not found or offline: " + playerName
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "Player not found or offline: " + playerName
             );
         }
 
@@ -129,7 +129,7 @@ public class ChatProvider {
      * Formats a message with optional color.
      *
      * @param message the message
-     * @param color the color code
+     * @param color   the color code
      * @return the formatted message
      */
     private String formatMessage(String message, String color) {
@@ -155,23 +155,40 @@ public class ChatProvider {
      */
     private String getColorCode(String colorName) {
         switch (colorName.toLowerCase()) {
-            case "black": return "&0";
-            case "dark_blue": return "&1";
-            case "dark_green": return "&2";
-            case "dark_aqua": return "&3";
-            case "dark_red": return "&4";
-            case "dark_purple": return "&5";
-            case "gold": return "&6";
-            case "gray": return "&7";
-            case "dark_gray": return "&8";
-            case "blue": return "&9";
-            case "green": return "&a";
-            case "aqua": return "&b";
-            case "red": return "&c";
-            case "light_purple": return "&d";
-            case "yellow": return "&e";
-            case "white": return "&f";
-            default: return null;
+            case "black":
+                return "&0";
+            case "dark_blue":
+                return "&1";
+            case "dark_green":
+                return "&2";
+            case "dark_aqua":
+                return "&3";
+            case "dark_red":
+                return "&4";
+            case "dark_purple":
+                return "&5";
+            case "gold":
+                return "&6";
+            case "gray":
+                return "&7";
+            case "dark_gray":
+                return "&8";
+            case "blue":
+                return "&9";
+            case "green":
+                return "&a";
+            case "aqua":
+                return "&b";
+            case "red":
+                return "&c";
+            case "light_purple":
+                return "&d";
+            case "yellow":
+                return "&e";
+            case "white":
+                return "&f";
+            default:
+                return null;
         }
     }
 }

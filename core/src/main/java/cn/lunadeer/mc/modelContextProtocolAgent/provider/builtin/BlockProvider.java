@@ -9,8 +9,10 @@ import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.ErrorCode;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.RiskLevel;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.LocationParam;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.PaginationParam;
+import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.block.BlockInfo;
+import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.block.BlockListResult;
+import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.block.BlockSetting;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -32,10 +34,10 @@ import java.util.Map;
  * @since 1.0.0
  */
 @McpProvider(
-    id = "mcp-internal-block",
-    name = "MCP Block Provider",
-    version = "1.0.0",
-    description = "Built-in capabilities for Minecraft block management"
+        id = "mcp-internal-block",
+        name = "MCP Block Provider",
+        version = "1.0.0",
+        description = "Built-in capabilities for Minecraft block management"
 )
 public class BlockProvider {
 
@@ -46,21 +48,21 @@ public class BlockProvider {
      * @return the block information
      */
     @McpContext(
-        id = "block.info.get",
-        name = "Get Block Info",
-        description = "Retrieves information about a block at a specific location",
-        permissions = {"mcp.context.block.info"},
-        tags = {"block", "info", "query"}
+            id = "block.info.get",
+            name = "Get Block Info",
+            description = "Retrieves information about a block at a specific location",
+            permissions = {"mcp.context.block.info"},
+            tags = {"block", "info", "query"}
     )
     public BlockInfo getBlockInfo(
-        @Param(name = "location", required = true, description = "The location to query")
-        LocationParam location
+            @Param(name = "location", required = true, description = "The location to query")
+            LocationParam location
     ) {
         World world = Bukkit.getWorld(location.world());
         if (world == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + location.world()
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "World not found: " + location.world()
             );
         }
 
@@ -69,11 +71,11 @@ public class BlockProvider {
 
         if (material == Material.AIR) {
             return new BlockInfo(
-                location,
-                material.name(),
-                null,
-                null,
-                null
+                    location,
+                    material.name(),
+                    null,
+                    null,
+                    null
             );
         }
 
@@ -99,48 +101,48 @@ public class BlockProvider {
         }
 
         return new BlockInfo(
-            location,
-            material.name(),
-            blockDataString,
-            properties,
-            Integer.valueOf(block.getLightLevel())
+                location,
+                material.name(),
+                blockDataString,
+                properties,
+                Integer.valueOf(block.getLightLevel())
         );
     }
 
     /**
      * Sets a block at a specific location.
      *
-     * @param location the location to set the block
-     * @param material the block material (e.g., "STONE", "DIRT")
+     * @param location  the location to set the block
+     * @param material  the block material (e.g., "STONE", "DIRT")
      * @param blockData optional block data string (e.g., "minecraft:stone")
-     * @param update whether to update neighboring blocks
+     * @param update    whether to update neighboring blocks
      * @return true if successful
      */
     @McpAction(
-        id = "block.set",
-        name = "Set Block",
-        description = "Sets a block at a specific location",
-        risk = RiskLevel.HIGH,
-        snapshotRequired = true,
-        rollbackSupported = true,
-        permissions = {"mcp.action.block.set"},
-        tags = {"block", "set", "modify"}
+            id = "block.set",
+            name = "Set Block",
+            description = "Sets a block at a specific location",
+            risk = RiskLevel.HIGH,
+            snapshotRequired = true,
+            rollbackSupported = true,
+            permissions = {"mcp.action.block.set"},
+            tags = {"block", "set", "modify"}
     )
     public Boolean setBlock(
-        @Param(name = "location", required = true, description = "The location to set the block")
-        LocationParam location,
-        @Param(name = "material", required = true, description = "The block material (e.g., 'STONE', 'DIRT')")
-        String material,
-        @Param(name = "blockData", description = "Optional block data string (e.g., 'minecraft:stone')")
-        String blockData,
-        @Param(name = "update", description = "Whether to update neighboring blocks", defaultValue = "true")
-        Boolean update
+            @Param(name = "location", required = true, description = "The location to set the block")
+            LocationParam location,
+            @Param(name = "material", required = true, description = "The block material (e.g., 'STONE', 'DIRT')")
+            String material,
+            @Param(name = "blockData", description = "Optional block data string (e.g., 'minecraft:stone')")
+            String blockData,
+            @Param(name = "update", description = "Whether to update neighboring blocks", defaultValue = "true")
+            Boolean update
     ) {
         World world = Bukkit.getWorld(location.world());
         if (world == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + location.world()
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "World not found: " + location.world()
             );
         }
 
@@ -150,8 +152,8 @@ public class BlockProvider {
             Material blockMaterial = Material.getMaterial(material.toUpperCase());
             if (blockMaterial == null) {
                 throw new McpBusinessException(
-                    ErrorCode.OPERATION_FAILED.getErrorCode(),
-                    "Invalid material: " + material
+                        ErrorCode.OPERATION_FAILED.getErrorCode(),
+                        "Invalid material: " + material
                 );
             }
 
@@ -167,8 +169,8 @@ public class BlockProvider {
             return true;
         } catch (Exception e) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "Failed to set block: " + e.getMessage()
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "Failed to set block: " + e.getMessage()
             );
         }
     }
@@ -181,25 +183,25 @@ public class BlockProvider {
      * @return the number of blocks set successfully
      */
     @McpAction(
-        id = "block.set.batch",
-        name = "Set Blocks (Batch)",
-        description = "Sets multiple blocks at specified locations",
-        risk = RiskLevel.HIGH,
-        snapshotRequired = true,
-        rollbackSupported = true,
-        permissions = {"mcp.action.block.set.batch"},
-        tags = {"block", "set", "batch", "modify"}
+            id = "block.set.batch",
+            name = "Set Blocks (Batch)",
+            description = "Sets multiple blocks at specified locations",
+            risk = RiskLevel.HIGH,
+            snapshotRequired = true,
+            rollbackSupported = true,
+            permissions = {"mcp.action.block.set.batch"},
+            tags = {"block", "set", "batch", "modify"}
     )
     public Integer setBlocksBatch(
-        @Param(name = "blocks", required = true, description = "List of block settings")
-        List<BlockSetting> blocks,
-        @Param(name = "update", description = "Whether to update neighboring blocks", defaultValue = "true")
-        Boolean update
+            @Param(name = "blocks", required = true, description = "List of block settings")
+            List<BlockSetting> blocks,
+            @Param(name = "update", description = "Whether to update neighboring blocks", defaultValue = "true")
+            Boolean update
     ) {
         if (blocks == null || blocks.isEmpty()) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "No blocks specified"
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "No blocks specified"
             );
         }
 
@@ -212,9 +214,9 @@ public class BlockProvider {
                 }
 
                 Block block = world.getBlockAt(
-                    (int) blockSetting.location().x(),
-                    (int) blockSetting.location().y(),
-                    (int) blockSetting.location().z()
+                        (int) blockSetting.location().x(),
+                        (int) blockSetting.location().y(),
+                        (int) blockSetting.location().z()
                 );
 
                 Material blockMaterial = Material.getMaterial(blockSetting.material().toUpperCase());
@@ -241,49 +243,49 @@ public class BlockProvider {
     /**
      * Gets blocks in a specified area.
      *
-     * @param worldName the name of the world
-     * @param minX the minimum X coordinate
-     * @param minY the minimum Y coordinate
-     * @param minZ the minimum Z coordinate
-     * @param maxX the maximum X coordinate
-     * @param maxY the maximum Y coordinate
-     * @param maxZ the maximum Z coordinate
+     * @param worldName      the name of the world
+     * @param minX           the minimum X coordinate
+     * @param minY           the minimum Y coordinate
+     * @param minZ           the minimum Z coordinate
+     * @param maxX           the maximum X coordinate
+     * @param maxY           the maximum Y coordinate
+     * @param maxZ           the maximum Z coordinate
      * @param materialFilter optional material filter
-     * @param pagination optional pagination parameters
+     * @param pagination     optional pagination parameters
      * @return the list of block information
      */
     @McpContext(
-        id = "block.list.area",
-        name = "List Blocks in Area",
-        description = "Gets blocks in a specified area",
-        permissions = {"mcp.context.block.list.area"},
-        tags = {"block", "list", "area", "query"}
+            id = "block.list.area",
+            name = "List Blocks in Area",
+            description = "Gets blocks in a specified area",
+            permissions = {"mcp.context.block.list.area"},
+            tags = {"block", "list", "area", "query"}
     )
     public BlockListResult getBlocksInArea(
-        @Param(name = "worldName", required = true, description = "The name of the world")
-        String worldName,
-        @Param(name = "minX", required = true, description = "Minimum X coordinate")
-        Integer minX,
-        @Param(name = "minY", required = true, description = "Minimum Y coordinate")
-        Integer minY,
-        @Param(name = "minZ", required = true, description = "Minimum Z coordinate")
-        Integer minZ,
-        @Param(name = "maxX", required = true, description = "Maximum X coordinate")
-        Integer maxX,
-        @Param(name = "maxY", required = true, description = "Maximum Y coordinate")
-        Integer maxY,
-        @Param(name = "maxZ", required = true, description = "Maximum Z coordinate")
-        Integer maxZ,
-        @Param(name = "materialFilter", description = "Material filter (e.g., 'STONE', 'DIRT')")
-        String materialFilter,
-        @Param(name = "pagination", description = "Pagination parameters")
-        PaginationParam pagination
+            @Param(name = "worldName", required = true, description = "The name of the world")
+            String worldName,
+            @Param(name = "minX", required = true, description = "Minimum X coordinate")
+            Integer minX,
+            @Param(name = "minY", required = true, description = "Minimum Y coordinate")
+            Integer minY,
+            @Param(name = "minZ", required = true, description = "Minimum Z coordinate")
+            Integer minZ,
+            @Param(name = "maxX", required = true, description = "Maximum X coordinate")
+            Integer maxX,
+            @Param(name = "maxY", required = true, description = "Maximum Y coordinate")
+            Integer maxY,
+            @Param(name = "maxZ", required = true, description = "Maximum Z coordinate")
+            Integer maxZ,
+            @Param(name = "materialFilter", description = "Material filter (e.g., 'STONE', 'DIRT')")
+            String materialFilter,
+            @Param(name = "pagination", description = "Pagination parameters")
+            PaginationParam pagination
     ) {
         World world = Bukkit.getWorld(worldName);
         if (world == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + worldName
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "World not found: " + worldName
             );
         }
 
@@ -330,11 +332,11 @@ public class BlockProvider {
 
                     LocationParam locationParam = LocationParam.create(worldName, x, y, z);
                     blocks.add(new BlockInfo(
-                        locationParam,
-                        material.name(),
-                        blockDataString,
-                        properties,
-                        Integer.valueOf(block.getLightLevel())
+                            locationParam,
+                            material.name(),
+                            blockDataString,
+                            properties,
+                            Integer.valueOf(block.getLightLevel())
                     ));
                 }
             }
@@ -352,8 +354,8 @@ public class BlockProvider {
         int offset = pagination.getOffset();
 
         List<BlockInfo> paginated = blocks.subList(
-            Math.min(offset, total),
-            Math.min(offset + pageSize, total)
+                Math.min(offset, total),
+                Math.min(offset + pageSize, total)
         );
 
         return new BlockListResult(paginated, total, page, pageSize, totalPages);
@@ -362,66 +364,66 @@ public class BlockProvider {
     /**
      * Replaces blocks in a specified area with another block.
      *
-     * @param worldName the name of the world
-     * @param minX the minimum X coordinate
-     * @param minY the minimum Y coordinate
-     * @param minZ the minimum Z coordinate
-     * @param maxX the maximum X coordinate
-     * @param maxY the maximum Y coordinate
-     * @param maxZ the maximum Z coordinate
-     * @param targetMaterial the target material to replace with
-     * @param sourceMaterial optional source material to replace (if null, replaces all non-air blocks)
+     * @param worldName       the name of the world
+     * @param minX            the minimum X coordinate
+     * @param minY            the minimum Y coordinate
+     * @param minZ            the minimum Z coordinate
+     * @param maxX            the maximum X coordinate
+     * @param maxY            the maximum Y coordinate
+     * @param maxZ            the maximum Z coordinate
+     * @param targetMaterial  the target material to replace with
+     * @param sourceMaterial  optional source material to replace (if null, replaces all non-air blocks)
      * @param targetBlockData optional target block data string
-     * @param update whether to update neighboring blocks
+     * @param update          whether to update neighboring blocks
      * @return the number of blocks replaced
      */
     @McpAction(
-        id = "block.replace.area",
-        name = "Replace Blocks in Area",
-        description = "Replaces blocks in a specified area with another block",
-        risk = RiskLevel.HIGH,
-        snapshotRequired = true,
-        rollbackSupported = true,
-        permissions = {"mcp.action.block.replace.area"},
-        tags = {"block", "replace", "area", "modify"}
+            id = "block.replace.area",
+            name = "Replace Blocks in Area",
+            description = "Replaces blocks in a specified area with another block",
+            risk = RiskLevel.HIGH,
+            snapshotRequired = true,
+            rollbackSupported = true,
+            permissions = {"mcp.action.block.replace.area"},
+            tags = {"block", "replace", "area", "modify"}
     )
     public Integer replaceBlocksInArea(
-        @Param(name = "worldName", required = true, description = "The name of the world")
-        String worldName,
-        @Param(name = "minX", required = true, description = "Minimum X coordinate")
-        Integer minX,
-        @Param(name = "minY", required = true, description = "Minimum Y coordinate")
-        Integer minY,
-        @Param(name = "minZ", required = true, description = "Minimum Z coordinate")
-        Integer minZ,
-        @Param(name = "maxX", required = true, description = "Maximum X coordinate")
-        Integer maxX,
-        @Param(name = "maxY", required = true, description = "Maximum Y coordinate")
-        Integer maxY,
-        @Param(name = "maxZ", required = true, description = "Maximum Z coordinate")
-        Integer maxZ,
-        @Param(name = "targetMaterial", required = true, description = "The target material to replace with")
-        String targetMaterial,
-        @Param(name = "sourceMaterial", description = "The source material to replace (if null, replaces all non-air blocks)")
-        String sourceMaterial,
-        @Param(name = "targetBlockData", description = "Optional target block data string")
-        String targetBlockData,
-        @Param(name = "update", description = "Whether to update neighboring blocks", defaultValue = "true")
-        Boolean update
+            @Param(name = "worldName", required = true, description = "The name of the world")
+            String worldName,
+            @Param(name = "minX", required = true, description = "Minimum X coordinate")
+            Integer minX,
+            @Param(name = "minY", required = true, description = "Minimum Y coordinate")
+            Integer minY,
+            @Param(name = "minZ", required = true, description = "Minimum Z coordinate")
+            Integer minZ,
+            @Param(name = "maxX", required = true, description = "Maximum X coordinate")
+            Integer maxX,
+            @Param(name = "maxY", required = true, description = "Maximum Y coordinate")
+            Integer maxY,
+            @Param(name = "maxZ", required = true, description = "Maximum Z coordinate")
+            Integer maxZ,
+            @Param(name = "targetMaterial", required = true, description = "The target material to replace with")
+            String targetMaterial,
+            @Param(name = "sourceMaterial", description = "The source material to replace (if null, replaces all non-air blocks)")
+            String sourceMaterial,
+            @Param(name = "targetBlockData", description = "Optional target block data string")
+            String targetBlockData,
+            @Param(name = "update", description = "Whether to update neighboring blocks", defaultValue = "true")
+            Boolean update
     ) {
         World world = Bukkit.getWorld(worldName);
         if (world == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + worldName
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "World not found: " + worldName
             );
         }
 
         Material targetMat = Material.getMaterial(targetMaterial.toUpperCase());
         if (targetMat == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "Invalid target material: " + targetMaterial
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "Invalid target material: " + targetMaterial
             );
         }
 
@@ -430,8 +432,8 @@ public class BlockProvider {
             sourceMat = Material.getMaterial(sourceMaterial.toUpperCase());
             if (sourceMat == null) {
                 throw new McpBusinessException(
-                    ErrorCode.OPERATION_FAILED.getErrorCode(),
-                    "Invalid source material: " + sourceMaterial
+                        ErrorCode.OPERATION_FAILED.getErrorCode(),
+                        "Invalid source material: " + sourceMaterial
                 );
             }
         }
@@ -473,48 +475,48 @@ public class BlockProvider {
      * Clears blocks in a specified area (sets to air).
      *
      * @param worldName the name of the world
-     * @param minX the minimum X coordinate
-     * @param minY the minimum Y coordinate
-     * @param minZ the minimum Z coordinate
-     * @param maxX the maximum X coordinate
-     * @param maxY the maximum Y coordinate
-     * @param maxZ the maximum Z coordinate
-     * @param update whether to update neighboring blocks
+     * @param minX      the minimum X coordinate
+     * @param minY      the minimum Y coordinate
+     * @param minZ      the minimum Z coordinate
+     * @param maxX      the maximum X coordinate
+     * @param maxY      the maximum Y coordinate
+     * @param maxZ      the maximum Z coordinate
+     * @param update    whether to update neighboring blocks
      * @return the number of blocks cleared
      */
     @McpAction(
-        id = "block.clear.area",
-        name = "Clear Blocks in Area",
-        description = "Clears blocks in a specified area (sets to air)",
-        risk = RiskLevel.HIGH,
-        snapshotRequired = true,
-        rollbackSupported = true,
-        permissions = {"mcp.action.block.clear.area"},
-        tags = {"block", "clear", "area", "modify"}
+            id = "block.clear.area",
+            name = "Clear Blocks in Area",
+            description = "Clears blocks in a specified area (sets to air)",
+            risk = RiskLevel.HIGH,
+            snapshotRequired = true,
+            rollbackSupported = true,
+            permissions = {"mcp.action.block.clear.area"},
+            tags = {"block", "clear", "area", "modify"}
     )
     public Integer clearBlocksInArea(
-        @Param(name = "worldName", required = true, description = "The name of the world")
-        String worldName,
-        @Param(name = "minX", required = true, description = "Minimum X coordinate")
-        Integer minX,
-        @Param(name = "minY", required = true, description = "Minimum Y coordinate")
-        Integer minY,
-        @Param(name = "minZ", required = true, description = "Minimum Z coordinate")
-        Integer minZ,
-        @Param(name = "maxX", required = true, description = "Maximum X coordinate")
-        Integer maxX,
-        @Param(name = "maxY", required = true, description = "Maximum Y coordinate")
-        Integer maxY,
-        @Param(name = "maxZ", required = true, description = "Maximum Z coordinate")
-        Integer maxZ,
-        @Param(name = "update", description = "Whether to update neighboring blocks", defaultValue = "true")
-        Boolean update
+            @Param(name = "worldName", required = true, description = "The name of the world")
+            String worldName,
+            @Param(name = "minX", required = true, description = "Minimum X coordinate")
+            Integer minX,
+            @Param(name = "minY", required = true, description = "Minimum Y coordinate")
+            Integer minY,
+            @Param(name = "minZ", required = true, description = "Minimum Z coordinate")
+            Integer minZ,
+            @Param(name = "maxX", required = true, description = "Maximum X coordinate")
+            Integer maxX,
+            @Param(name = "maxY", required = true, description = "Maximum Y coordinate")
+            Integer maxY,
+            @Param(name = "maxZ", required = true, description = "Maximum Z coordinate")
+            Integer maxZ,
+            @Param(name = "update", description = "Whether to update neighboring blocks", defaultValue = "true")
+            Boolean update
     ) {
         World world = Bukkit.getWorld(worldName);
         if (world == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + worldName
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "World not found: " + worldName
             );
         }
 
@@ -541,21 +543,21 @@ public class BlockProvider {
      * @return the material name
      */
     @McpContext(
-        id = "block.material.get",
-        name = "Get Block Material",
-        description = "Retrieves the material of a block at a specific location",
-        permissions = {"mcp.context.block.material"},
-        tags = {"block", "material", "query"}
+            id = "block.material.get",
+            name = "Get Block Material",
+            description = "Retrieves the material of a block at a specific location",
+            permissions = {"mcp.context.block.material"},
+            tags = {"block", "material", "query"}
     )
     public String getBlockMaterial(
-        @Param(name = "location", required = true, description = "The location to query")
-        LocationParam location
+            @Param(name = "location", required = true, description = "The location to query")
+            LocationParam location
     ) {
         World world = Bukkit.getWorld(location.world());
         if (world == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + location.world()
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "World not found: " + location.world()
             );
         }
 
@@ -570,21 +572,21 @@ public class BlockProvider {
      * @return the block data string
      */
     @McpContext(
-        id = "block.data.get",
-        name = "Get Block Data",
-        description = "Retrieves the block data of a block at a specific location",
-        permissions = {"mcp.context.block.data"},
-        tags = {"block", "data", "query"}
+            id = "block.data.get",
+            name = "Get Block Data",
+            description = "Retrieves the block data of a block at a specific location",
+            permissions = {"mcp.context.block.data"},
+            tags = {"block", "data", "query"}
     )
     public String getBlockData(
-        @Param(name = "location", required = true, description = "The location to query")
-        LocationParam location
+            @Param(name = "location", required = true, description = "The location to query")
+            LocationParam location
     ) {
         World world = Bukkit.getWorld(location.world());
         if (world == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + location.world()
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "World not found: " + location.world()
             );
         }
 
@@ -600,21 +602,21 @@ public class BlockProvider {
      * @return the light level (0-15)
      */
     @McpContext(
-        id = "block.light.get",
-        name = "Get Block Light Level",
-        description = "Retrieves the light level at a specific location",
-        permissions = {"mcp.context.block.light"},
-        tags = {"block", "light", "query"}
+            id = "block.light.get",
+            name = "Get Block Light Level",
+            description = "Retrieves the light level at a specific location",
+            permissions = {"mcp.context.block.light"},
+            tags = {"block", "light", "query"}
     )
     public Integer getBlockLight(
-        @Param(name = "location", required = true, description = "The location to query")
-        LocationParam location
+            @Param(name = "location", required = true, description = "The location to query")
+            LocationParam location
     ) {
         World world = Bukkit.getWorld(location.world());
         if (world == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + location.world()
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "World not found: " + location.world()
             );
         }
 
@@ -622,60 +624,4 @@ public class BlockProvider {
         return Integer.valueOf(block.getLightLevel());
     }
 
-    /**
-     * Data transfer object representing block information.
-     */
-    public record BlockInfo(
-        @Param(description = "Location of the block", required = true)
-        LocationParam location,
-
-        @Param(description = "Material name", required = true)
-        String material,
-
-        @Param(description = "Block data string")
-        String blockData,
-
-        @Param(description = "Block state properties")
-        Map<String, String> properties,
-
-        @Param(description = "Light level (0-15)")
-        Integer lightLevel
-    ) {
-    }
-
-    /**
-     * Data transfer object representing a block setting for batch operations.
-     */
-    public record BlockSetting(
-        @Param(description = "Location of the block", required = true)
-        LocationParam location,
-
-        @Param(description = "Material name", required = true)
-        String material,
-
-        @Param(description = "Block data string")
-        String blockData
-    ) {
-    }
-
-    /**
-     * Data transfer object representing a list of blocks with pagination.
-     */
-    public record BlockListResult(
-        @Param(description = "List of blocks", required = true)
-        List<BlockInfo> blocks,
-
-        @Param(description = "Total number of blocks", required = true)
-        Integer total,
-
-        @Param(description = "Current page number", required = true)
-        Integer page,
-
-        @Param(description = "Number of items per page", required = true)
-        Integer pageSize,
-
-        @Param(description = "Total number of pages", required = true)
-        Integer totalPages
-    ) {
-    }
 }

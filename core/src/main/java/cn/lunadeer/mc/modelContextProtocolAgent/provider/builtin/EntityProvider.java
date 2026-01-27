@@ -17,6 +17,8 @@ import org.bukkit.entity.Entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import static cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.LocationParam.toBukkitLocation;
+
 /**
  * Built-in MCP provider for entity-related capabilities.
  * <p>
@@ -28,47 +30,47 @@ import java.util.List;
  * @since 1.0.0
  */
 @McpProvider(
-    id = "mcp-internal-entity",
-    name = "MCP Entity Provider",
-    version = "1.0.0",
-    description = "Built-in capabilities for Minecraft entity management"
+        id = "mcp-internal-entity",
+        name = "MCP Entity Provider",
+        version = "1.0.0",
+        description = "Built-in capabilities for Minecraft entity management"
 )
 public class EntityProvider {
 
     /**
      * Lists entities in a world with optional filtering and pagination.
      *
-     * @param worldName the name of the world
+     * @param worldName  the name of the world
      * @param entityType optional entity type filter
-     * @param location optional center location for radius filtering
-     * @param radius optional radius from center location
+     * @param location   optional center location for radius filtering
+     * @param radius     optional radius from center location
      * @param pagination optional pagination parameters
      * @return the list of entities
      */
     @McpContext(
-        id = "entity.list",
-        name = "List Entities",
-        description = "Lists entities in a world with optional filtering",
-        permissions = {"mcp.context.entity.list"},
-        tags = {"entity", "list", "query"}
+            id = "entity.list",
+            name = "List Entities",
+            description = "Lists entities in a world with optional filtering",
+            permissions = {"mcp.context.entity.list"},
+            tags = {"entity", "list", "query"}
     )
     public List<String> listEntities(
-        @Param(name = "worldName", required = true, description = "The name of the world")
-        String worldName,
-        @Param(name = "entityType", description = "Entity type filter (e.g., 'Zombie', 'Cow')")
-        String entityType,
-        @Param(name = "location", description = "Center location for radius filtering")
-        LocationParam location,
-        @Param(name = "radius", description = "Radius from center location")
-        Double radius,
-        @Param(name = "pagination", description = "Pagination parameters")
-        PaginationParam pagination
+            @Param(name = "worldName", required = true, description = "The name of the world")
+            String worldName,
+            @Param(name = "entityType", description = "Entity type filter (e.g., 'Zombie', 'Cow')")
+            String entityType,
+            @Param(name = "location", description = "Center location for radius filtering")
+            LocationParam location,
+            @Param(name = "radius", description = "Radius from center location")
+            Double radius,
+            @Param(name = "pagination", description = "Pagination parameters")
+            PaginationParam pagination
     ) {
         World world = Bukkit.getWorld(worldName);
         if (world == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + worldName
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "World not found: " + worldName
             );
         }
 
@@ -112,40 +114,40 @@ public class EntityProvider {
     /**
      * Removes entities from a world.
      *
-     * @param worldName the name of the world
-     * @param entityType optional entity type filter
-     * @param location optional center location for radius filtering
-     * @param radius optional radius from center location
+     * @param worldName      the name of the world
+     * @param entityType     optional entity type filter
+     * @param location       optional center location for radius filtering
+     * @param radius         optional radius from center location
      * @param excludePlayers whether to exclude players
      * @return the number of entities removed
      */
     @McpAction(
-        id = "entity.remove",
-        name = "Remove Entities",
-        description = "Removes entities from a world",
-        risk = RiskLevel.HIGH,
-        snapshotRequired = true,
-        rollbackSupported = true,
-        permissions = {"mcp.action.entity.remove"},
-        tags = {"entity", "remove", "modify"}
+            id = "entity.remove",
+            name = "Remove Entities",
+            description = "Removes entities from a world",
+            risk = RiskLevel.HIGH,
+            snapshotRequired = true,
+            rollbackSupported = true,
+            permissions = {"mcp.action.entity.remove"},
+            tags = {"entity", "remove", "modify"}
     )
     public Integer removeEntities(
-        @Param(name = "worldName", required = true, description = "The name of the world")
-        String worldName,
-        @Param(name = "entityType", description = "Entity type filter (e.g., 'Zombie', 'Cow')")
-        String entityType,
-        @Param(name = "location", description = "Center location for radius filtering")
-        LocationParam location,
-        @Param(name = "radius", description = "Radius from center location")
-        Double radius,
-        @Param(name = "excludePlayers", description = "Whether to exclude players from removal")
-        Boolean excludePlayers
+            @Param(name = "worldName", required = true, description = "The name of the world")
+            String worldName,
+            @Param(name = "entityType", description = "Entity type filter (e.g., 'Zombie', 'Cow')")
+            String entityType,
+            @Param(name = "location", description = "Center location for radius filtering")
+            LocationParam location,
+            @Param(name = "radius", description = "Radius from center location")
+            Double radius,
+            @Param(name = "excludePlayers", description = "Whether to exclude players from removal")
+            Boolean excludePlayers
     ) {
         World world = Bukkit.getWorld(worldName);
         if (world == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + worldName
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "World not found: " + worldName
             );
         }
 
@@ -181,32 +183,5 @@ public class EntityProvider {
         }
 
         return removedCount;
-    }
-
-    /**
-     * Converts a LocationParam to Bukkit Location.
-     *
-     * @param locationParam the location param
-     * @return the Bukkit location
-     */
-    private Location toBukkitLocation(LocationParam locationParam) {
-        if (locationParam == null) {
-            return null;
-        }
-        org.bukkit.World world = Bukkit.getWorld(locationParam.world());
-        if (world == null) {
-            throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + locationParam.world()
-            );
-        }
-        return new Location(
-            world,
-            locationParam.x(),
-            locationParam.y(),
-            locationParam.z(),
-            locationParam.yaw(),
-            locationParam.pitch()
-        );
     }
 }

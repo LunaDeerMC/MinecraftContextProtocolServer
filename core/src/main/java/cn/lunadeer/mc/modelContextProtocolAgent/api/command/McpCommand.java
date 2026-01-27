@@ -33,7 +33,7 @@ public abstract class McpCommand implements CommandExecutor, TabCompleter {
      * Executes the command.
      *
      * @param sender the command sender
-     * @param args the command arguments
+     * @param args   the command arguments
      * @return true if the command was handled successfully
      */
     protected abstract boolean execute(CommandSender sender, String[] args);
@@ -47,7 +47,7 @@ public abstract class McpCommand implements CommandExecutor, TabCompleter {
      * Gets tab completions for the command.
      *
      * @param sender the command sender
-     * @param args the current arguments
+     * @param args   the current arguments
      * @return list of possible completions
      */
     protected List<String> getTabCompletions(CommandSender sender, String[] args) {
@@ -57,7 +57,7 @@ public abstract class McpCommand implements CommandExecutor, TabCompleter {
     /**
      * Checks if the sender has the required permission.
      *
-     * @param sender the command sender
+     * @param sender     the command sender
      * @param permission the permission node
      * @return true if the sender has the permission
      */
@@ -68,7 +68,7 @@ public abstract class McpCommand implements CommandExecutor, TabCompleter {
     /**
      * Sends a message to the sender.
      *
-     * @param sender the command sender
+     * @param sender  the command sender
      * @param message the message to send
      */
     protected void sendMessage(CommandSender sender, String message) {
@@ -78,7 +78,7 @@ public abstract class McpCommand implements CommandExecutor, TabCompleter {
     /**
      * Sends an error message to the sender.
      *
-     * @param sender the command sender
+     * @param sender  the command sender
      * @param message the error message
      */
     protected void sendError(CommandSender sender, String message) {
@@ -88,7 +88,7 @@ public abstract class McpCommand implements CommandExecutor, TabCompleter {
     /**
      * Sends a success message to the sender.
      *
-     * @param sender the command sender
+     * @param sender  the command sender
      * @param message the success message
      */
     protected void sendSuccess(CommandSender sender, String message) {

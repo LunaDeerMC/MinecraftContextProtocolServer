@@ -7,7 +7,8 @@ import cn.lunadeer.mc.modelContextProtocolAgentSDK.annotations.Param;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.exception.McpBusinessException;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.ErrorCode;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.RiskLevel;
-import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.*;
+import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.TpsResult;
+import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.world.*;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
@@ -22,10 +23,10 @@ import org.bukkit.World;
  * @since 1.0.0
  */
 @McpProvider(
-    id = "mcp-internal-world",
-    name = "MCP World Provider",
-    version = "1.0.0",
-    description = "Built-in capabilities for Minecraft world management"
+        id = "mcp-internal-world",
+        name = "MCP World Provider",
+        version = "1.0.0",
+        description = "Built-in capabilities for Minecraft world management"
 )
 public class WorldProvider {
 
@@ -36,31 +37,31 @@ public class WorldProvider {
      * @return the world time result
      */
     @McpContext(
-        id = "world.time.get",
-        name = "Get World Time",
-        description = "Retrieves the current time of a world",
-        permissions = {"mcp.context.world.time"},
-        tags = {"world", "time", "query"}
+            id = "world.time.get",
+            name = "Get World Time",
+            description = "Retrieves the current time of a world",
+            permissions = {"mcp.context.world.time"},
+            tags = {"world", "time", "query"}
     )
     public WorldTimeResult getWorldTime(
-        @Param(name = "worldName", required = true, description = "The name of the world")
-        String worldName
+            @Param(name = "worldName", required = true, description = "The name of the world")
+            String worldName
     ) {
         World world = Bukkit.getWorld(worldName);
         if (world == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + worldName
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "World not found: " + worldName
             );
         }
 
         long time = world.getTime();
         return new WorldTimeResult(
-            worldName,
-            time,
-            world.getFullTime(),
-            (int) (world.getFullTime() / 24000),
-            time < 12000 ? WorldTimeResult.TimePhase.DAY : WorldTimeResult.TimePhase.NIGHT
+                worldName,
+                time,
+                world.getFullTime(),
+                (int) (world.getFullTime() / 24000),
+                time < 12000 ? WorldTimeResult.TimePhase.DAY : WorldTimeResult.TimePhase.NIGHT
         );
     }
 
@@ -68,33 +69,33 @@ public class WorldProvider {
      * Sets the time of a world.
      *
      * @param worldName the name of the world
-     * @param time the time to set (0-24000)
-     * @param reason optional reason for the change
+     * @param time      the time to set (0-24000)
+     * @param reason    optional reason for the change
      * @return the set time result
      */
     @McpAction(
-        id = "world.time.set",
-        name = "Set World Time",
-        description = "Sets the current time of a world",
-        risk = RiskLevel.HIGH,
-        snapshotRequired = true,
-        rollbackSupported = true,
-        permissions = {"mcp.action.world.time"},
-        tags = {"world", "time", "modify"}
+            id = "world.time.set",
+            name = "Set World Time",
+            description = "Sets the current time of a world",
+            risk = RiskLevel.HIGH,
+            snapshotRequired = true,
+            rollbackSupported = true,
+            permissions = {"mcp.action.world.time"},
+            tags = {"world", "time", "modify"}
     )
     public SetTimeResult setWorldTime(
-        @Param(name = "worldName", required = true, description = "The name of the world")
-        String worldName,
-        @Param(name = "time", required = true, description = "The time to set (0-24000)", min = 0, max = 24000)
-        Long time,
-        @Param(name = "reason", description = "Reason for the change")
-        String reason
+            @Param(name = "worldName", required = true, description = "The name of the world")
+            String worldName,
+            @Param(name = "time", required = true, description = "The time to set (0-24000)", min = 0, max = 24000)
+            Long time,
+            @Param(name = "reason", description = "Reason for the change")
+            String reason
     ) {
         World world = Bukkit.getWorld(worldName);
         if (world == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + worldName
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "World not found: " + worldName
             );
         }
 
@@ -111,33 +112,33 @@ public class WorldProvider {
      * @return the weather result
      */
     @McpContext(
-        id = "world.weather.get",
-        name = "Get Weather",
-        description = "Retrieves the current weather of a world",
-        permissions = {"mcp.context.world.weather"},
-        tags = {"world", "weather", "query"}
+            id = "world.weather.get",
+            name = "Get Weather",
+            description = "Retrieves the current weather of a world",
+            permissions = {"mcp.context.world.weather"},
+            tags = {"world", "weather", "query"}
     )
     public WeatherResult getWeather(
-        @Param(name = "worldName", required = true, description = "The name of the world")
-        String worldName
+            @Param(name = "worldName", required = true, description = "The name of the world")
+            String worldName
     ) {
         World world = Bukkit.getWorld(worldName);
         if (world == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + worldName
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "World not found: " + worldName
             );
         }
 
-        cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.WeatherType type;
+        WeatherType type;
         if (world.hasStorm()) {
             if (world.isThundering()) {
-                type = cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.WeatherType.THUNDER;
+                type = WeatherType.THUNDER;
             } else {
-                type = cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.WeatherType.RAIN;
+                type = WeatherType.RAIN;
             }
         } else {
-            type = cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.WeatherType.CLEAR;
+            type = WeatherType.CLEAR;
         }
 
         return new WeatherResult(worldName, type, world.getWeatherDuration());
@@ -147,43 +148,43 @@ public class WorldProvider {
      * Sets the weather of a world.
      *
      * @param worldName the name of the world
-     * @param type the weather type to set
-     * @param duration optional duration in ticks
+     * @param type      the weather type to set
+     * @param duration  optional duration in ticks
      * @return the set weather result
      */
     @McpAction(
-        id = "world.weather.set",
-        name = "Set Weather",
-        description = "Sets the weather of a world",
-        risk = RiskLevel.MEDIUM,
-        permissions = {"mcp.action.world.weather"},
-        tags = {"world", "weather", "modify"}
+            id = "world.weather.set",
+            name = "Set Weather",
+            description = "Sets the weather of a world",
+            risk = RiskLevel.MEDIUM,
+            permissions = {"mcp.action.world.weather"},
+            tags = {"world", "weather", "modify"}
     )
     public SetWeatherResult setWeather(
-        @Param(name = "worldName", required = true, description = "The name of the world")
-        String worldName,
-        @Param(name = "type", required = true, description = "The weather type to set")
-        WeatherType type,
-        @Param(name = "duration", description = "Duration in ticks")
-        Integer duration
+            @Param(name = "worldName", required = true, description = "The name of the world")
+            String worldName,
+            @Param(name = "type", required = true, description = "The weather type to set")
+            WeatherType type,
+            @Param(name = "duration", description = "Duration in ticks")
+            Integer duration
     ) {
         World world = Bukkit.getWorld(worldName);
         if (world == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + worldName
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "World not found: " + worldName
             );
         }
 
-        cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.WeatherType previousType;
+        WeatherType previousType;
         if (world.hasStorm()) {
             if (world.isThundering()) {
-                previousType = cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.WeatherType.THUNDER;
+                previousType = WeatherType.THUNDER;
             } else {
-                previousType = cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.WeatherType.RAIN;
+                previousType = WeatherType.RAIN;
             }
         } else {
-            previousType = cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.WeatherType.CLEAR;
+            previousType = WeatherType.CLEAR;
         }
 
         // Set weather
@@ -215,19 +216,19 @@ public class WorldProvider {
      * @return the TPS result
      */
     @McpContext(
-        id = "world.tps.get",
-        name = "Get TPS",
-        description = "Retrieves the server's TPS (Ticks Per Second) metrics",
-        permissions = {"mcp.context.world.tps"},
-        tags = {"world", "performance", "query"}
+            id = "world.tps.get",
+            name = "Get TPS",
+            description = "Retrieves the server's TPS (Ticks Per Second) metrics",
+            permissions = {"mcp.context.world.tps"},
+            tags = {"world", "performance", "query"}
     )
     public TpsResult getTps() {
         double[] tps = Bukkit.getTPS();
         return new TpsResult(
-            tps.length > 0 ? tps[0] : null,
-            tps.length > 1 ? tps[1] : null,
-            tps.length > 2 ? tps[2] : null,
-            Bukkit.getAverageTickTime()
+                tps.length > 0 ? tps[0] : null,
+                tps.length > 1 ? tps[1] : null,
+                tps.length > 2 ? tps[2] : null,
+                Bukkit.getAverageTickTime()
         );
     }
 
@@ -235,35 +236,35 @@ public class WorldProvider {
      * Gets a game rule value from a world.
      *
      * @param worldName the name of the world
-     * @param rule the game rule name
+     * @param rule      the game rule name
      * @return the game rule value
      */
     @McpContext(
-        id = "world.rule.get",
-        name = "Get Game Rule",
-        description = "Retrieves a game rule value from a world",
-        permissions = {"mcp.context.world.rule"},
-        tags = {"world", "rule", "query"}
+            id = "world.rule.get",
+            name = "Get Game Rule",
+            description = "Retrieves a game rule value from a world",
+            permissions = {"mcp.context.world.rule"},
+            tags = {"world", "rule", "query"}
     )
     public String getGameRule(
-        @Param(name = "worldName", required = true, description = "The name of the world")
-        String worldName,
-        @Param(name = "rule", required = true, description = "The game rule name")
-        String rule
+            @Param(name = "worldName", required = true, description = "The name of the world")
+            String worldName,
+            @Param(name = "rule", required = true, description = "The game rule name")
+            String rule
     ) {
         World world = Bukkit.getWorld(worldName);
         if (world == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + worldName
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "World not found: " + worldName
             );
         }
 
         String value = world.getGameRuleValue(rule);
         if (value == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "Game rule not found: " + rule
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "Game rule not found: " + rule
             );
         }
 
@@ -274,33 +275,33 @@ public class WorldProvider {
      * Sets a game rule value in a world.
      *
      * @param worldName the name of the world
-     * @param rule the game rule name
-     * @param value the game rule value
+     * @param rule      the game rule name
+     * @param value     the game rule value
      * @return true if successful
      */
     @McpAction(
-        id = "world.rule.set",
-        name = "Set Game Rule",
-        description = "Sets a game rule value in a world",
-        risk = RiskLevel.HIGH,
-        snapshotRequired = true,
-        rollbackSupported = true,
-        permissions = {"mcp.action.world.rule"},
-        tags = {"world", "rule", "modify"}
+            id = "world.rule.set",
+            name = "Set Game Rule",
+            description = "Sets a game rule value in a world",
+            risk = RiskLevel.HIGH,
+            snapshotRequired = true,
+            rollbackSupported = true,
+            permissions = {"mcp.action.world.rule"},
+            tags = {"world", "rule", "modify"}
     )
     public Boolean setGameRule(
-        @Param(name = "worldName", required = true, description = "The name of the world")
-        String worldName,
-        @Param(name = "rule", required = true, description = "The game rule name")
-        String rule,
-        @Param(name = "value", required = true, description = "The game rule value")
-        String value
+            @Param(name = "worldName", required = true, description = "The name of the world")
+            String worldName,
+            @Param(name = "rule", required = true, description = "The game rule name")
+            String rule,
+            @Param(name = "value", required = true, description = "The game rule value")
+            String value
     ) {
         World world = Bukkit.getWorld(worldName);
         if (world == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + worldName
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "World not found: " + worldName
             );
         }
 

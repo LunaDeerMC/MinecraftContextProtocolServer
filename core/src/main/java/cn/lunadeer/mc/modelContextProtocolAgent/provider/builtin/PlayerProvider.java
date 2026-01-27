@@ -7,7 +7,12 @@ import cn.lunadeer.mc.modelContextProtocolAgentSDK.annotations.Param;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.exception.McpBusinessException;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.ErrorCode;
 import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.RiskLevel;
-import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.*;
+import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.LocationParam;
+import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.PaginationParam;
+import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.TeleportResult;
+import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.player.KickResult;
+import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.player.PlayerInfo;
+import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.player.PlayerListResult;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -16,6 +21,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static cn.lunadeer.mc.modelContextProtocolAgentSDK.model.dto.LocationParam.toBukkitLocation;
 
 /**
  * Built-in MCP provider for player-related capabilities.
@@ -28,10 +35,10 @@ import java.util.List;
  * @since 1.0.0
  */
 @McpProvider(
-    id = "mcp-internal-player",
-    name = "MCP Player Provider",
-    version = "1.0.0",
-    description = "Built-in capabilities for Minecraft player management"
+        id = "mcp-internal-player",
+        name = "MCP Player Provider",
+        version = "1.0.0",
+        description = "Built-in capabilities for Minecraft player management"
 )
 public class PlayerProvider {
 
@@ -42,15 +49,15 @@ public class PlayerProvider {
      * @return the player list result
      */
     @McpContext(
-        id = "player.list",
-        name = "Get Player List",
-        description = "Retrieves a list of online players with pagination",
-        permissions = {"mcp.context.player.list"},
-        tags = {"player", "list", "query"}
+            id = "player.list",
+            name = "Get Player List",
+            description = "Retrieves a list of online players with pagination",
+            permissions = {"mcp.context.player.list"},
+            tags = {"player", "list", "query"}
     )
     public PlayerListResult getPlayerList(
-        @Param(name = "pagination", description = "Pagination parameters")
-        PaginationParam pagination
+            @Param(name = "pagination", description = "Pagination parameters")
+            PaginationParam pagination
     ) {
         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
 
@@ -71,8 +78,8 @@ public class PlayerProvider {
         int offset = pagination.getOffset();
 
         List<PlayerInfo> paginated = playerInfos.subList(
-            Math.min(offset, total),
-            Math.min(offset + pageSize, total)
+                Math.min(offset, total),
+                Math.min(offset + pageSize, total)
         );
 
         return new PlayerListResult(paginated, total, page, pageSize, totalPages);
@@ -82,27 +89,27 @@ public class PlayerProvider {
      * Gets detailed information about a player.
      *
      * @param playerName optional player name
-     * @param uuid optional player UUID
+     * @param uuid       optional player UUID
      * @return the player info
      */
     @McpContext(
-        id = "player.info.get",
-        name = "Get Player Info",
-        description = "Retrieves detailed information about a player",
-        permissions = {"mcp.context.player.info"},
-        tags = {"player", "info", "query"}
+            id = "player.info.get",
+            name = "Get Player Info",
+            description = "Retrieves detailed information about a player",
+            permissions = {"mcp.context.player.info"},
+            tags = {"player", "info", "query"}
     )
     public PlayerInfo getPlayerInfo(
-        @Param(name = "playerName", description = "Player name")
-        String playerName,
-        @Param(name = "uuid", description = "Player UUID")
-        String uuid
+            @Param(name = "playerName", description = "Player name")
+            String playerName,
+            @Param(name = "uuid", description = "Player UUID")
+            String uuid
     ) {
         Player player = resolvePlayer(playerName, uuid);
         if (player == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "Player not found"
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "Player not found"
             );
         }
 
@@ -113,32 +120,32 @@ public class PlayerProvider {
      * Teleports a player to a location.
      *
      * @param playerName the player name
-     * @param location the target location
-     * @param reason optional reason for teleport
+     * @param location   the target location
+     * @param reason     optional reason for teleport
      * @return the teleport result
      */
     @McpAction(
-        id = "player.teleport",
-        name = "Teleport Player",
-        description = "Teleports a player to a specified location",
-        risk = RiskLevel.MEDIUM,
-        rollbackSupported = true,
-        permissions = {"mcp.action.player.teleport"},
-        tags = {"player", "teleport", "modify"}
+            id = "player.teleport",
+            name = "Teleport Player",
+            description = "Teleports a player to a specified location",
+            risk = RiskLevel.MEDIUM,
+            rollbackSupported = true,
+            permissions = {"mcp.action.player.teleport"},
+            tags = {"player", "teleport", "modify"}
     )
     public TeleportResult teleportPlayer(
-        @Param(name = "playerName", required = true, description = "Player name")
-        String playerName,
-        @Param(name = "location", required = true, description = "Target location")
-        LocationParam location,
-        @Param(name = "reason", description = "Reason for teleport")
-        String reason
+            @Param(name = "playerName", required = true, description = "Player name")
+            String playerName,
+            @Param(name = "location", required = true, description = "Target location")
+            LocationParam location,
+            @Param(name = "reason", description = "Reason for teleport")
+            String reason
     ) {
         Player player = Bukkit.getPlayer(playerName);
         if (player == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "Player not found or offline: " + playerName
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "Player not found or offline: " + playerName
             );
         }
 
@@ -148,9 +155,9 @@ public class PlayerProvider {
         boolean success = player.teleport(targetLocation);
 
         return new TeleportResult(
-            success,
-            toLocationParam(previousLocation),
-            location
+                success,
+                toLocationParam(previousLocation),
+                location
         );
     }
 
@@ -158,28 +165,28 @@ public class PlayerProvider {
      * Kicks a player from the server.
      *
      * @param playerName the player name
-     * @param reason optional kick reason
+     * @param reason     optional kick reason
      * @return the kick result
      */
     @McpAction(
-        id = "player.kick",
-        name = "Kick Player",
-        description = "Kicks a player from the server",
-        risk = RiskLevel.MEDIUM,
-        permissions = {"mcp.action.player.kick"},
-        tags = {"player", "kick", "modify"}
+            id = "player.kick",
+            name = "Kick Player",
+            description = "Kicks a player from the server",
+            risk = RiskLevel.MEDIUM,
+            permissions = {"mcp.action.player.kick"},
+            tags = {"player", "kick", "modify"}
     )
     public KickResult kickPlayer(
-        @Param(name = "playerName", required = true, description = "Player name")
-        String playerName,
-        @Param(name = "reason", description = "Kick reason")
-        String reason
+            @Param(name = "playerName", required = true, description = "Player name")
+            String playerName,
+            @Param(name = "reason", description = "Kick reason")
+            String reason
     ) {
         Player player = Bukkit.getPlayer(playerName);
         if (player == null) {
             throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "Player not found or offline: " + playerName
+                    ErrorCode.OPERATION_FAILED.getErrorCode(),
+                    "Player not found or offline: " + playerName
             );
         }
 
@@ -193,7 +200,7 @@ public class PlayerProvider {
      * Resolves a player from name or UUID.
      *
      * @param playerName the player name
-     * @param uuid the player UUID
+     * @param uuid       the player UUID
      * @return the player, or null if not found
      */
     private Player resolvePlayer(String playerName, String uuid) {
@@ -219,21 +226,21 @@ public class PlayerProvider {
      */
     private PlayerInfo toPlayerInfo(Player player) {
         return new PlayerInfo(
-            player.getName(),
-            player.getUniqueId().toString(),
-            player.getDisplayName(),
-            toLocationParam(player.getLocation()),
-            player.getHealth(),
-            player.getMaxHealth(),
-            player.getFoodLevel(),
-            player.getLevel(),
-            player.getExp(),
-            player.getGameMode().name(),
-            player.isOp(),
-            player.isFlying(),
-            player.getPing(),
-            Instant.ofEpochMilli(player.getFirstPlayed()),
-            Instant.ofEpochMilli(player.getLastPlayed())
+                player.getName(),
+                player.getUniqueId().toString(),
+                player.getDisplayName(),
+                toLocationParam(player.getLocation()),
+                player.getHealth(),
+                player.getMaxHealth(),
+                player.getFoodLevel(),
+                player.getLevel(),
+                player.getExp(),
+                player.getGameMode().name(),
+                player.isOp(),
+                player.isFlying(),
+                player.getPing(),
+                Instant.ofEpochMilli(player.getFirstPlayed()),
+                Instant.ofEpochMilli(player.getLastPlayed())
         );
     }
 
@@ -248,39 +255,14 @@ public class PlayerProvider {
             return null;
         }
         return LocationParam.create(
-            location.getWorld() != null ? location.getWorld().getName() : null,
-            location.getX(),
-            location.getY(),
-            location.getZ(),
-            location.getYaw(),
-            location.getPitch()
+                location.getWorld() != null ? location.getWorld().getName() : null,
+                location.getX(),
+                location.getY(),
+                location.getZ(),
+                location.getYaw(),
+                location.getPitch()
         );
     }
 
-    /**
-     * Converts a LocationParam to Bukkit Location.
-     *
-     * @param locationParam the location param
-     * @return the Bukkit location
-     */
-    private Location toBukkitLocation(LocationParam locationParam) {
-        if (locationParam == null) {
-            return null;
-        }
-        org.bukkit.World world = Bukkit.getWorld(locationParam.world());
-        if (world == null) {
-            throw new McpBusinessException(
-                ErrorCode.OPERATION_FAILED.getErrorCode(),
-                "World not found: " + locationParam.world()
-            );
-        }
-        return new Location(
-            world,
-            locationParam.x(),
-            locationParam.y(),
-            locationParam.z(),
-            locationParam.yaw(),
-            locationParam.pitch()
-        );
-    }
+
 }

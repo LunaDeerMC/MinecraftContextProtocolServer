@@ -31,6 +31,7 @@ public class SessionManager {
         public String sessionCleanupError = "Error in session cleanup task: {0}";
         public String maxConnectionsReached = "Maximum connections reached ({0}), rejecting gateway {1}";
     }
+
     private final Map<String, GatewaySession> sessions = new ConcurrentHashMap<>();
     private final Map<String, GatewaySession> authenticatedSessions = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler;

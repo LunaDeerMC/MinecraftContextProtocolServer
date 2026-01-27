@@ -98,14 +98,14 @@ public class AuditLogger implements ExecutionInterceptor {
     /**
      * Builds an audit event from the execution context.
      *
-     * @param context the execution context
+     * @param context   the execution context
      * @param eventType the event type
-     * @param result the execution result
-     * @param error the error message
+     * @param result    the execution result
+     * @param error     the error message
      * @return the audit event
      */
     private AuditEvent buildEvent(ExecutionContext context, AuditEventType eventType,
-                                 Object result, String error) {
+                                  Object result, String error) {
         CallerInfo caller = context.getCaller();
         Map<String, Object> sanitizedRequest = sanitizeRequest(context.getParameters());
 
@@ -189,11 +189,11 @@ public class AuditLogger implements ExecutionInterceptor {
         }
         String lower = fieldName.toLowerCase();
         return lower.contains("password") ||
-               lower.contains("token") ||
-               lower.contains("secret") ||
-               lower.contains("key") ||
-               lower.contains("auth") ||
-               lower.contains("credential");
+                lower.contains("token") ||
+                lower.contains("secret") ||
+                lower.contains("key") ||
+                lower.contains("auth") ||
+                lower.contains("credential");
     }
 
     /**

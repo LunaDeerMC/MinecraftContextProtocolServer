@@ -51,9 +51,9 @@ public class SchemaValidator {
     /**
      * Validates request parameters against the capability's parameter schema.
      *
-     * @param capabilityId the capability ID
+     * @param capabilityId    the capability ID
      * @param parameterSchema the parameter schema (JSON Schema format)
-     * @param parameters the parameters to validate
+     * @param parameters      the parameters to validate
      * @throws McpValidationException if validation fails
      */
     public void validateParameters(String capabilityId,
@@ -109,7 +109,7 @@ public class SchemaValidator {
      *
      * @param capabilityId the capability ID
      * @param returnSchema the return schema (JSON Schema format)
-     * @param returnValue the return value to validate
+     * @param returnValue  the return value to validate
      * @throws McpValidationException if validation fails
      */
     public void validateReturn(String capabilityId,
@@ -142,8 +142,8 @@ public class SchemaValidator {
     /**
      * Validates a single parameter's type and constraints.
      *
-     * @param paramName the parameter name
-     * @param paramValue the parameter value
+     * @param paramName   the parameter name
+     * @param paramValue  the parameter value
      * @param paramSchema the parameter schema
      */
     private void validateParameterType(String paramName, Object paramValue, Map<?, ?> paramSchema) {
@@ -195,8 +195,8 @@ public class SchemaValidator {
     /**
      * Validates that a value matches the expected type.
      *
-     * @param name the value name (for error messages)
-     * @param value the value to validate
+     * @param name         the value name (for error messages)
+     * @param value        the value to validate
      * @param expectedType the expected JSON type
      */
     private void validateType(String name, Object value, String expectedType) {

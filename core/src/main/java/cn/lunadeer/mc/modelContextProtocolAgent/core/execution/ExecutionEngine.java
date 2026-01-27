@@ -47,7 +47,7 @@ public class ExecutionEngine {
     /**
      * Constructs a new ExecutionEngine.
      *
-     * @param registry the capability registry
+     * @param registry     the capability registry
      * @param interceptors the execution interceptors
      */
     public ExecutionEngine(CapabilityRegistry registry, List<ExecutionInterceptor> interceptors) {
@@ -61,7 +61,7 @@ public class ExecutionEngine {
      * Executes a capability request.
      *
      * @param request the MCP request
-     * @param caller the caller information
+     * @param caller  the caller information
      * @return a future that completes with the response
      */
     public CompletableFuture<McpResponse> execute(McpRequest request, CallerInfo caller) {
@@ -112,7 +112,7 @@ public class ExecutionEngine {
      * Creates an execution context from a request.
      *
      * @param request the MCP request
-     * @param caller the caller information
+     * @param caller  the caller information
      * @return the execution context, or null if capability not found
      */
     private ExecutionContext createExecutionContext(McpRequest request, CallerInfo caller) {
@@ -170,7 +170,7 @@ public class ExecutionEngine {
     /**
      * Prepares method arguments from parameters map.
      *
-     * @param method the handler method
+     * @param method     the handler method
      * @param parameters the parameters map
      * @return the prepared arguments array
      */
@@ -193,7 +193,7 @@ public class ExecutionEngine {
     /**
      * Converts a parameter value to the expected type.
      *
-     * @param value the parameter value
+     * @param value      the parameter value
      * @param targetType the target type
      * @return the converted value
      */
@@ -236,7 +236,7 @@ public class ExecutionEngine {
     /**
      * Converts a value to an enum constant.
      *
-     * @param value the value to convert
+     * @param value    the value to convert
      * @param enumType the enum type
      * @return the enum constant
      */
@@ -276,7 +276,7 @@ public class ExecutionEngine {
      * Builds a success response.
      *
      * @param requestId the request ID
-     * @param result the execution result
+     * @param result    the execution result
      * @return the success response
      */
     private McpResponse buildSuccessResponse(String requestId, Object result) {

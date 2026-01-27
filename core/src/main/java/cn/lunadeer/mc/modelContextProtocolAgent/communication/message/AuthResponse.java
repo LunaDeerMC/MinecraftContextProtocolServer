@@ -81,7 +81,7 @@ public class AuthResponse extends McpMessage {
                 agentInfoObj.addProperty("name", agentInfo.getName());
                 agentInfoObj.addProperty("version", agentInfo.getVersion());
                 agentInfoObj.addProperty("environment", agentInfo.getEnvironment());
-                
+
                 if (agentInfo.getServerInfo() != null) {
                     JsonObject serverInfoObj = new JsonObject();
                     serverInfoObj.addProperty("name", agentInfo.getServerInfo().getName());
@@ -92,7 +92,7 @@ public class AuthResponse extends McpMessage {
                 }
                 payload.add("agentInfo", agentInfoObj);
             }
-            
+
             if (config != null) {
                 JsonObject configObj = new JsonObject();
                 configObj.addProperty("heartbeatInterval", config.getHeartbeatInterval());

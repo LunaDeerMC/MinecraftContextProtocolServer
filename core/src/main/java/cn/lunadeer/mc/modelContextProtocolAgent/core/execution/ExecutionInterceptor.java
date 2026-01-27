@@ -30,7 +30,7 @@ public interface ExecutionInterceptor {
      * Called after successful capability execution.
      *
      * @param context the execution context
-     * @param result the execution result
+     * @param result  the execution result
      */
     void postHandle(ExecutionContext context, Object result);
 
@@ -38,7 +38,7 @@ public interface ExecutionInterceptor {
      * Called when an exception occurs during execution.
      *
      * @param context the execution context
-     * @param ex the exception
+     * @param ex      the exception
      */
     void onError(ExecutionContext context, Throwable ex);
 

@@ -19,6 +19,7 @@ public class GatewaySession {
     public static class GatewaySessionText extends ConfigurationPart {
         public String closingSession = "Closing session {0} with code {1}: {2}";
     }
+
     private final String id;
     private final WebSocketConnection connection;
     private final Instant connectedAt;
@@ -112,7 +113,7 @@ public class GatewaySession {
      * Closes the session.
      *
      * @param statusCode the WebSocket close status code
-     * @param reason the close reason
+     * @param reason     the close reason
      */
     public void close(int statusCode, String reason) {
         XLogger.debug(I18n.gatewaySessionText.closingSession, id, statusCode, reason);

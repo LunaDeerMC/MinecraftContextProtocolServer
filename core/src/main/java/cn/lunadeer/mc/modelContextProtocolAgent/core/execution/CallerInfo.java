@@ -37,10 +37,10 @@ public class CallerInfo {
     /**
      * Constructs a new CallerInfo.
      *
-     * @param id the caller ID
-     * @param name the caller name
+     * @param id          the caller ID
+     * @param name        the caller name
      * @param permissions the caller's permissions
-     * @param roles the caller's roles
+     * @param roles       the caller's roles
      */
     public CallerInfo(String id, String name, Set<String> permissions, Set<String> roles) {
         this.id = id;

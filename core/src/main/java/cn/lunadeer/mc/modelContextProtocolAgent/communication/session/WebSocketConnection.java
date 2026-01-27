@@ -21,7 +21,7 @@ public interface WebSocketConnection {
      * Closes the connection.
      *
      * @param statusCode the WebSocket close status code
-     * @param reason the close reason
+     * @param reason     the close reason
      */
     void close(int statusCode, String reason);
 }
