@@ -57,7 +57,7 @@ public class AgentWebSocketServer {
         this.executionEngine = executionEngine;
         this.sessionManager = new SessionManager(300); // 5 minutes timeout
         this.messageCodec = new MessageCodec();
-        this.heartbeatHandler = new HeartbeatHandler(sessionManager);
+        this.heartbeatHandler = new HeartbeatHandler(sessionManager, messageCodec);
         this.messageRouter = new MessageRouter();
         initializeMessageHandlers();
     }

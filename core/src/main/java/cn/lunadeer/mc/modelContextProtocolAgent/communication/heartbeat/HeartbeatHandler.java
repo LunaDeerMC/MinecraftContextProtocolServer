@@ -1,6 +1,7 @@
 package cn.lunadeer.mc.modelContextProtocolAgent.communication.heartbeat;
 
 import cn.lunadeer.mc.modelContextProtocolAgent.Configuration;
+import cn.lunadeer.mc.modelContextProtocolAgent.communication.codec.MessageCodec;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.message.AgentStatus;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.message.HeartbeatAck;
 import cn.lunadeer.mc.modelContextProtocolAgent.communication.message.HeartbeatMessage;
@@ -14,6 +15,8 @@ import org.bukkit.Bukkit;
 
 import java.time.Instant;
 import java.util.UUID;
+
+import static cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.Misc.isPaper;
 
 /**
  * Handles heartbeat monitoring for Gateway connections.
@@ -32,18 +35,21 @@ public class HeartbeatHandler {
         public String heartbeatAckReceived = "Received heartbeat ack from gateway {0}";
         public String heartbeatRetryExceeded = "Gateway {0} exceeded max retries ({1}), closing connection";
     }
+
     private final SessionManager sessionManager;
     private final long intervalMs;
     private final long timeoutMs;
     private final long reconnectDelayMs;
     private final int maxRetries;
+    private final MessageCodec messageCodec;
 
-    public HeartbeatHandler(SessionManager sessionManager) {
+    public HeartbeatHandler(SessionManager sessionManager, MessageCodec messageCodec) {
         this.sessionManager = sessionManager;
         this.intervalMs = Configuration.websocketServer.heartbeatInterval;
         this.timeoutMs = Configuration.websocketServer.heartbeatTimeout;
         this.reconnectDelayMs = Configuration.websocketServer.reconnectDelay;
         this.maxRetries = Configuration.websocketServer.maxRetries;
+        this.messageCodec = messageCodec;
     }
 
     /**
@@ -110,7 +116,7 @@ public class HeartbeatHandler {
                     .status(buildStatus())
                     .build();
 
-            session.send(heartbeat.toString()).exceptionally(ex -> {
+            session.send(messageCodec.encode(heartbeat)).exceptionally(ex -> {
                 XLogger.error(I18n.heartbeatHandlerText.heartbeatSendFailed,
                         session.getGatewayId(), ex.getMessage());
                 return null;
@@ -118,6 +124,7 @@ public class HeartbeatHandler {
         } catch (Exception e) {
             XLogger.error(I18n.heartbeatHandlerText.heartbeatSendError,
                     session.getGatewayId(), e.getMessage());
+            XLogger.error(e);
         }
     }
 
@@ -125,7 +132,7 @@ public class HeartbeatHandler {
      * Handles a heartbeat acknowledgment from a Gateway.
      *
      * @param sessionId the session ID
-     * @param ack the heartbeat acknowledgment
+     * @param ack       the heartbeat acknowledgment
      */
     public void onHeartbeatAck(String sessionId, HeartbeatAck ack) {
         GatewaySession session = sessionManager.getSession(sessionId);
@@ -142,7 +149,7 @@ public class HeartbeatHandler {
      * @return the agent status
      */
     private AgentStatus buildStatus() {
-        double[] tps = Bukkit.getTPS();
+        double[] tps = isPaper() ? new double[]{20.0, 20.0, 20.0} : Bukkit.getTPS();
         int onlinePlayers = Bukkit.getOnlinePlayers().size();
         Runtime runtime = Runtime.getRuntime();
         long usedMemory = runtime.totalMemory() - runtime.freeMemory();
