@@ -319,8 +319,8 @@ public class CapabilityRegistry implements McpProviderRegistry {
         }
 
         // Generate schemas
-        java.util.Map<String, Object> parameterSchema = SchemaGenerator.generateParameterSchema(method);
-        java.util.Map<String, Object> returnSchema = SchemaGenerator.generateReturnSchema(method);
+        java.util.Map<String, Object> inputSchema = SchemaGenerator.generateInputSchema(method);
+        java.util.Map<String, Object> outputSchema = SchemaGenerator.generateOutputSchema(method);
 
         // Create manifest
         CapabilityManifest manifest = new CapabilityManifest();
@@ -338,8 +338,8 @@ public class CapabilityRegistry implements McpProviderRegistry {
         manifest.setConfirmRequired(confirmRequired);
         manifest.setCacheable(cacheable);
         manifest.setCacheTtl(cacheTtl);
-        manifest.setParameterSchema(parameterSchema);
-        manifest.setReturnSchema(returnSchema);
+        manifest.setInputSchema(inputSchema);
+        manifest.setOutputSchema(outputSchema);
 
         // Create descriptor
         return new CapabilityDescriptor(
@@ -349,8 +349,8 @@ public class CapabilityRegistry implements McpProviderRegistry {
                 manifest,
                 providerInstance,
                 method,
-                parameterSchema,
-                returnSchema,
+                inputSchema,
+                outputSchema,
                 riskLevel,
                 permissions,
                 rollbackSupported,
