@@ -1,7 +1,9 @@
 package cn.lunadeer.mc.modelContextProtocolAgent.http_sse.transport;
 
+import cn.lunadeer.mc.modelContextProtocolAgent.core.registry.CapabilityRegistry;
 import cn.lunadeer.mc.modelContextProtocolAgent.http_sse.handler.InitializeHandler;
 import cn.lunadeer.mc.modelContextProtocolAgent.http_sse.handler.InitializedHandler;
+import cn.lunadeer.mc.modelContextProtocolAgent.http_sse.handler.ToolsHandler;
 import cn.lunadeer.mc.modelContextProtocolAgent.http_sse.lifecycle.SessionManager;
 import cn.lunadeer.mc.modelContextProtocolAgent.http_sse.message.JsonRpcMessage;
 import cn.lunadeer.mc.modelContextProtocolAgent.http_sse.message.JsonRpcNotification;
@@ -45,6 +47,7 @@ public class HttpSseTransport {
     private final SessionManager sessionManager;
     private final InitializeHandler initializeHandler;
     private final InitializedHandler initializedHandler;
+    private final ToolsHandler toolsHandler;
     private final String bearerToken;
     
     private HttpServer server;
@@ -56,6 +59,7 @@ public class HttpSseTransport {
             String host,
             int port,
             SessionManager sessionManager,
+            CapabilityRegistry capabilityRegistry,
             String agentId,
             String agentName,
             String agentVersion,
@@ -66,6 +70,7 @@ public class HttpSseTransport {
         this.sessionManager = sessionManager;
         this.initializeHandler = new InitializeHandler(sessionManager, agentId, agentName, agentVersion);
         this.initializedHandler = new InitializedHandler(sessionManager);
+        this.toolsHandler = new ToolsHandler(capabilityRegistry);
         this.bearerToken = bearerToken;
         this.mcpHandler = new McpHandler();
     }
@@ -279,9 +284,14 @@ public class HttpSseTransport {
             if ("initialize".equals(method)) {
                 XLogger.debug("MCP Handler: Handling initialize request");
                 return initializeHandler.handle(request, sessionId);
+            } else if ("tools/list".equals(method)) {
+                XLogger.debug("MCP Handler: Handling tools/list request");
+                return toolsHandler.handleToolsList(request, sessionId);
+            } else if ("tools/call".equals(method)) {
+                XLogger.debug("MCP Handler: Handling tools/call request");
+                return toolsHandler.handleToolsCall(request, sessionId);
             } else {
                 XLogger.warn("MCP Handler: Unknown method: " + method);
-                // TODO: Handle other MCP methods (tools/call, resources/read, etc.)
                 return JsonRpcResponse.createError(
                     request.getId(),
                     -32601,

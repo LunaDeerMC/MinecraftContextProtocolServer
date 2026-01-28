@@ -158,6 +158,7 @@ public final class ModelContextProtocolAgent extends JavaPlugin {
                     Configuration.httpSseMcpServer.host,
                     Configuration.httpSseMcpServer.port,
                     Configuration.httpSseMcpServer.bearerToken,
+                    capabilityRegistry,
                     Configuration.agentInfo.agentId,
                     Configuration.agentInfo.agentName,
                     Configuration.agentInfo.agentVersion

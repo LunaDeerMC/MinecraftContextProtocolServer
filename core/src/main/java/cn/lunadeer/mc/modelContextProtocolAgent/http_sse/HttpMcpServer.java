@@ -1,5 +1,6 @@
 package cn.lunadeer.mc.modelContextProtocolAgent.http_sse;
 
+import cn.lunadeer.mc.modelContextProtocolAgent.core.registry.CapabilityRegistry;
 import cn.lunadeer.mc.modelContextProtocolAgent.http_sse.lifecycle.SessionManager;
 import cn.lunadeer.mc.modelContextProtocolAgent.http_sse.transport.HttpSseTransport;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.XLogger;
@@ -28,6 +29,7 @@ public class HttpMcpServer {
     private final String host;
     private final int port;
     private final String bearerToken;
+    private final CapabilityRegistry capabilityRegistry;
     private final String agentId;
     private final String agentName;
     private final String agentVersion;
@@ -42,6 +44,7 @@ public class HttpMcpServer {
      * @param host the host address
      * @param port the port number
      * @param bearerToken the bearer token for authentication
+     * @param capabilityRegistry the capability registry
      * @param agentId the agent ID
      * @param agentName the agent name
      * @param agentVersion the agent version
@@ -50,6 +53,7 @@ public class HttpMcpServer {
             String host,
             int port,
             String bearerToken,
+            CapabilityRegistry capabilityRegistry,
             String agentId,
             String agentName,
             String agentVersion
@@ -57,6 +61,7 @@ public class HttpMcpServer {
         this.host = host;
         this.port = port;
         this.bearerToken = bearerToken;
+        this.capabilityRegistry = capabilityRegistry;
         this.agentId = agentId;
         this.agentName = agentName;
         this.agentVersion = agentVersion;
@@ -84,6 +89,7 @@ public class HttpMcpServer {
                     host,
                     port,
                     sessionManager,
+                    capabilityRegistry,
                     agentId,
                     agentName,
                     agentVersion,
