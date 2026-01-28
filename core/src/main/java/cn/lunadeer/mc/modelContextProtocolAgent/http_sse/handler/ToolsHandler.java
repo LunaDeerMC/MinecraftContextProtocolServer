@@ -10,6 +10,7 @@ import cn.lunadeer.mc.modelContextProtocolAgent.http_sse.tool.ToolDecorator;
 import cn.lunadeer.mc.modelContextProtocolAgent.infrastructure.XLogger;
 import cn.lunadeer.mc.modelContextProtocolAgent.http_sse.message.JsonRpcRequest;
 import cn.lunadeer.mc.modelContextProtocolAgent.http_sse.message.JsonRpcResponse;
+import cn.lunadeer.mc.modelContextProtocolAgentSDK.model.CapabilityType;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -169,6 +170,7 @@ public class ToolsHandler {
             
         } catch (Exception e) {
             XLogger.error("Error handling tools/call: " + e.getMessage(), e);
+            XLogger.error(e);
             
             // Return tool execution error
             McpToolResult errorResult = McpToolResult.error("Tool execution failed: " + e.getMessage());
@@ -191,8 +193,8 @@ public class ToolsHandler {
             ProviderDescriptor provider = capabilityRegistry.getProviderDescriptor(providerId);
             if (provider != null) {
                 provider.getCapabilities().forEach(capability -> {
-                    // Only include ACTION type capabilities as tools
-                    if (capability.getType() == cn.lunadeer.mc.modelContextProtocolAgentSDK.model.CapabilityType.ACTION) {
+                    // Only include ACTION & CONTEXT type capabilities as tools
+                    if (capability.getType() == CapabilityType.ACTION || capability.getType() == CapabilityType.CONTEXT) {
                         allDescriptors.add(capability);
                     }
                 });
@@ -274,6 +276,7 @@ public class ToolsHandler {
             
         } catch (Exception e) {
             XLogger.error("Error invoking capability: " + descriptor.getId(), e);
+            XLogger.error(e);
             throw new Exception("Failed to invoke capability: " + e.getMessage(), e);
         }
     }
@@ -284,6 +287,19 @@ public class ToolsHandler {
     private Object convertParameter(Object value, Class<?> targetType) {
         if (value == null) {
             return null;
+        }
+        
+        // Handle enum conversion
+        if (targetType.isEnum()) {
+            if (value instanceof String) {
+                // Convert string to enum
+                return Enum.valueOf((Class<? extends Enum>) targetType, (String) value);
+            } else if (value instanceof Enum) {
+                return value;
+            } else {
+                // Try to convert to string first
+                return Enum.valueOf((Class<? extends Enum>) targetType, value.toString());
+            }
         }
         
         // Handle common conversions
