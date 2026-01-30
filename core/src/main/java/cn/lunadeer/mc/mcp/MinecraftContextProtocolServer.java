@@ -3,20 +3,20 @@ package cn.lunadeer.mc.mcp;
 import cn.lunadeer.mc.mcp.api.McpEventEmitterImpl;
 import cn.lunadeer.mc.mcp.api.McpServerImpl;
 import cn.lunadeer.mc.mcp.api.command.McpCommandManager;
-import cn.lunadeer.mc.mcp.communication.WebSocketServer;
+import cn.lunadeer.mc.mcp.builtin_provider.*;
+import cn.lunadeer.mc.mcp.server.websocket_gateway.WebSocketServer;
 import cn.lunadeer.mc.mcp.core.audit.AuditLogger;
 import cn.lunadeer.mc.mcp.core.execution.ExecutionEngine;
 import cn.lunadeer.mc.mcp.core.execution.ExecutionInterceptor;
 import cn.lunadeer.mc.mcp.core.permission.PermissionChecker;
 import cn.lunadeer.mc.mcp.core.registry.CapabilityRegistry;
-import cn.lunadeer.mc.mcp.http_sse.HttpServer;
+import cn.lunadeer.mc.mcp.server.http_sse.HttpServer;
 import cn.lunadeer.mc.mcp.infrastructure.I18n;
 import cn.lunadeer.mc.mcp.infrastructure.Notification;
 import cn.lunadeer.mc.mcp.infrastructure.XLogger;
 import cn.lunadeer.mc.mcp.infrastructure.configuration.ConfigurationManager;
 import cn.lunadeer.mc.mcp.infrastructure.configuration.ConfigurationPart;
 import cn.lunadeer.mc.mcp.infrastructure.scheduler.Scheduler;
-import cn.lunadeer.mc.mcp.provider.builtin.*;
 import cn.lunadeer.mc.mcp.sdk.api.McpServer;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -28,7 +28,7 @@ public final class MinecraftContextProtocolServer extends JavaPlugin {
 
     private WebSocketServer webSocketServer;
     private HttpServer httpServer;
-    private McpServerImpl mcpAgent;
+    private McpServerImpl mcpServer;
     private CapabilityRegistry capabilityRegistry;
     private McpEventEmitterImpl eventEmitter;
     private McpCommandManager commandManager;
@@ -196,7 +196,7 @@ public final class MinecraftContextProtocolServer extends JavaPlugin {
     private void initializeProviderLayer() {
         capabilityRegistry = new CapabilityRegistry();
         eventEmitter = new McpEventEmitterImpl();
-        mcpAgent = new McpServerImpl(capabilityRegistry, eventEmitter, getDescription().getVersion(), Configuration.serverInfo.serverId);
+        mcpServer = new McpServerImpl(capabilityRegistry, eventEmitter, getDescription().getVersion(), Configuration.serverInfo.serverId);
 
         // Create execution interceptors
         List<ExecutionInterceptor> interceptors = new ArrayList<>();
@@ -206,8 +206,8 @@ public final class MinecraftContextProtocolServer extends JavaPlugin {
         // Create execution engine
         executionEngine = new ExecutionEngine(capabilityRegistry, interceptors);
 
-        // Register the McpAgent service with Bukkit's service manager
-        getServer().getServicesManager().register(McpServer.class, mcpAgent, this, org.bukkit.plugin.ServicePriority.Normal);
+        // Register the McpServer service with Bukkit's service manager
+        getServer().getServicesManager().register(McpServer.class, mcpServer, this, org.bukkit.plugin.ServicePriority.Normal);
 
         XLogger.info("Provider layer initialized");
     }
@@ -233,12 +233,12 @@ public final class MinecraftContextProtocolServer extends JavaPlugin {
     }
 
     /**
-     * Gets the MCP Agent implementation.
+     * Gets the MCP Server implementation.
      *
-     * @return the MCP Agent
+     * @return the MCP Server
      */
-    public McpServerImpl getMcpAgent() {
-        return mcpAgent;
+    public McpServerImpl getMcpServer() {
+        return mcpServer;
     }
 
     /**

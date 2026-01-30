@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 import java.util.List;
 
 /**
- * Command to reload MCP Agent configuration.
+ * Command to reload MCP Server configuration.
  * <p>
  * Reloads the configuration file and restarts the WebSocket server if needed.
  * </p>
@@ -29,7 +29,7 @@ public class McpReloadCommand extends McpCommand {
             return false;
         }
 
-        sendMessage(sender, "§6Reloading MCP Agent configuration...");
+        sendMessage(sender, "§6Reloading MCP Server configuration...");
 
         try {
             // Stop the WebSocket server

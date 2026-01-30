@@ -2,8 +2,8 @@ package cn.lunadeer.mc.mcp.api.command;
 
 import cn.lunadeer.mc.mcp.Configuration;
 import cn.lunadeer.mc.mcp.MinecraftContextProtocolServer;
-import cn.lunadeer.mc.mcp.communication.WebSocketServer;
-import cn.lunadeer.mc.mcp.communication.session.SessionManager;
+import cn.lunadeer.mc.mcp.server.websocket_gateway.WebSocketServer;
+import cn.lunadeer.mc.mcp.server.websocket_gateway.session.SessionManager;
 import cn.lunadeer.mc.mcp.core.registry.CapabilityRegistry;
 import cn.lunadeer.mc.mcp.sdk.model.CapabilityType;
 import cn.lunadeer.mc.mcp.sdk.model.CapabilityManifest;
@@ -12,7 +12,7 @@ import org.bukkit.command.CommandSender;
 import java.util.List;
 
 /**
- * Command to display MCP Agent status.
+ * Command to display MCP Server status.
  * <p>
  * Shows connection status, registered capabilities, and active sessions.
  * </p>
@@ -38,9 +38,9 @@ public class McpStatusCommand extends McpCommand {
         WebSocketServer server = plugin.getWebSocketServer();
         CapabilityRegistry registry = plugin.getCapabilityRegistry();
 
-        sendMessage(sender, "§6=== MCP Agent Status ===");
+        sendMessage(sender, "§6=== MCP Server Status ===");
         sendMessage(sender, "§7Version: §f" + plugin.getDescription().getVersion());
-        sendMessage(sender, "§7Agent ID: §f" + Configuration.serverInfo.serverId);
+        sendMessage(sender, "§7Server ID: §f" + Configuration.serverInfo.serverId);
 
         // WebSocket Server Status
         if (server != null) {

@@ -17,7 +17,7 @@ public class Configuration extends ConfigurationFile {
         public String serverId = "mcp-server-default";
 
         @Comment("Display name for this MCP Server instance.")
-        public String serverName = "MCP Agent";
+        public String serverName = "MCP Server";
 
         @Comment("Version of this MCP Server instance.")
         public String serverVersion = "1.0.0";
@@ -26,7 +26,7 @@ public class Configuration extends ConfigurationFile {
         public String environment = "production";
     }
 
-    @Comment("Information about this MCP Agent.")
+    @Comment("Information about this MCP Server.")
     public static ServerInfo serverInfo = new ServerInfo();
 
     @Comments({
@@ -93,7 +93,7 @@ public class Configuration extends ConfigurationFile {
 
     @Comments({
             "Internal http SSE MCP server configuration.",
-            "Provides a standard http MCP server for other MCP clients (like Claude Code) to connect to this agent directly.",
+            "Provides a standard http MCP server for other MCP clients (like Claude Code) to connect to this Server directly.",
             "Server will start on http://<host>:<port>/mcp",
             "Connecting clients must provide the bearer token in the 'Authorization' header."
     })

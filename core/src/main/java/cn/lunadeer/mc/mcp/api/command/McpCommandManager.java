@@ -9,9 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Manages MCP Agent admin commands.
+ * Manages MCP Server admin commands.
  * <p>
- * Registers and handles all MCP Agent admin commands.
+ * Registers and handles all MCP Server admin commands.
  * </p>
  *
  * @author ZhangYuheng
@@ -28,7 +28,7 @@ public class McpCommandManager {
     }
 
     /**
-     * Registers all MCP Agent commands.
+     * Registers all MCP Server commands.
      */
     private void registerCommands() {
         // Register command handlers
@@ -112,8 +112,8 @@ public class McpCommandManager {
      * Sends help message to the sender.
      */
     private void sendHelp(CommandSender sender) {
-        sender.sendMessage("§6=== MCP Agent Commands ===");
-        sender.sendMessage("§7/mcp status §f- Show agent status");
+        sender.sendMessage("§6=== MCP Server Commands ===");
+        sender.sendMessage("§7/mcp status §f- Show Server status");
         sender.sendMessage("§7/mcp reload §f- Reload configuration");
         sender.sendMessage("§7/mcp providers §f- List registered providers");
         sender.sendMessage("§7/mcp capabilities §f- List registered capabilities");

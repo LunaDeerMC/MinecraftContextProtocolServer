@@ -1,14 +1,14 @@
 package cn.lunadeer.mc.mcp.api;
 
 import cn.lunadeer.mc.mcp.core.registry.CapabilityRegistry;
-import cn.lunadeer.mc.mcp.sdk.api.McpServer;
 import cn.lunadeer.mc.mcp.sdk.api.McpEventEmitter;
 import cn.lunadeer.mc.mcp.sdk.api.McpProviderRegistry;
+import cn.lunadeer.mc.mcp.sdk.api.McpServer;
 
 /**
- * Implementation of the McpAgent interface.
+ * Implementation of the McpServer interface.
  * <p>
- * Provides access to core MCP Agent functionality including the provider registry
+ * Provides access to core MCP Server functionality including the provider registry
  * and event emitter.
  * </p>
  *
@@ -20,27 +20,27 @@ public class McpServerImpl implements McpServer {
     private final CapabilityRegistry providerRegistry;
     private final McpEventEmitter eventEmitter;
     private final String version;
-    private final String agentId;
+    private final String serverId;
     private boolean connected = false;
 
     /**
-     * Constructs a new McpAgentImpl.
+     * Constructs a new McpServerImpl.
      *
      * @param providerRegistry the provider registry
      * @param eventEmitter     the event emitter
-     * @param version          the agent version
-     * @param agentId          the agent ID
+     * @param version          the server version
+     * @param serverId         the server ID
      */
     public McpServerImpl(
             CapabilityRegistry providerRegistry,
             McpEventEmitter eventEmitter,
             String version,
-            String agentId
+            String serverId
     ) {
         this.providerRegistry = providerRegistry;
         this.eventEmitter = eventEmitter;
         this.version = version;
-        this.agentId = agentId;
+        this.serverId = serverId;
     }
 
     @Override
@@ -73,8 +73,8 @@ public class McpServerImpl implements McpServer {
     }
 
     @Override
-    public String getAgentId() {
-        return agentId;
+    public String getServerId() {
+        return serverId;
     }
 
     /**

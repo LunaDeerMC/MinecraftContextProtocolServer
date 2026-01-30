@@ -1,9 +1,9 @@
 package cn.lunadeer.mc.mcp.api.command;
 
 import cn.lunadeer.mc.mcp.MinecraftContextProtocolServer;
-import cn.lunadeer.mc.mcp.communication.WebSocketServer;
-import cn.lunadeer.mc.mcp.communication.session.GatewaySession;
-import cn.lunadeer.mc.mcp.communication.session.SessionManager;
+import cn.lunadeer.mc.mcp.server.websocket_gateway.WebSocketServer;
+import cn.lunadeer.mc.mcp.server.websocket_gateway.session.GatewaySession;
+import cn.lunadeer.mc.mcp.server.websocket_gateway.session.SessionManager;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Command to kick a Gateway session.
  * <p>
- * Disconnects a specific Gateway session from the agent.
+ * Disconnects a specific Gateway session from the Server.
  * </p>
  *
  * @author ZhangYuheng

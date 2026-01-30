@@ -10,7 +10,6 @@ commands:
     description: MCP Server admin command
     usage: /<command> <subcommand>
     permission: mcp.admin
-    aliases: [mcagent]
 
 permissions:
   mcp.admin:

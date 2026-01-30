@@ -1,7 +1,7 @@
 package cn.lunadeer.mc.mcp.core.execution;
 
-import cn.lunadeer.mc.mcp.communication.message.McpRequest;
-import cn.lunadeer.mc.mcp.communication.message.McpResponse;
+import cn.lunadeer.mc.mcp.server.websocket_gateway.message.McpRequest;
+import cn.lunadeer.mc.mcp.server.websocket_gateway.message.McpResponse;
 import cn.lunadeer.mc.mcp.core.registry.CapabilityDescriptor;
 import cn.lunadeer.mc.mcp.core.registry.CapabilityRegistry;
 import cn.lunadeer.mc.mcp.infrastructure.I18n;

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Base class for MCP Agent admin commands.
+ * Base class for MCP Server admin commands.
  * <p>
  * Provides common functionality for command handling and tab completion.
  * </p>

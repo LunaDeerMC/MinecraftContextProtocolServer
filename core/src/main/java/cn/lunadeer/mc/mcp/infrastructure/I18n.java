@@ -1,13 +1,13 @@
 package cn.lunadeer.mc.mcp.infrastructure;
 
 import cn.lunadeer.mc.mcp.MinecraftContextProtocolServer;
-import cn.lunadeer.mc.mcp.communication.WebSocketServer;
-import cn.lunadeer.mc.mcp.communication.MessageRouter;
-import cn.lunadeer.mc.mcp.communication.auth.AuthHandler;
-import cn.lunadeer.mc.mcp.communication.codec.MessageCodec;
-import cn.lunadeer.mc.mcp.communication.heartbeat.HeartbeatHandler;
-import cn.lunadeer.mc.mcp.communication.session.GatewaySession;
-import cn.lunadeer.mc.mcp.communication.session.SessionManager;
+import cn.lunadeer.mc.mcp.server.websocket_gateway.WebSocketServer;
+import cn.lunadeer.mc.mcp.server.websocket_gateway.MessageRouter;
+import cn.lunadeer.mc.mcp.server.websocket_gateway.auth.AuthHandler;
+import cn.lunadeer.mc.mcp.server.websocket_gateway.codec.MessageCodec;
+import cn.lunadeer.mc.mcp.server.websocket_gateway.heartbeat.HeartbeatHandler;
+import cn.lunadeer.mc.mcp.server.websocket_gateway.session.GatewaySession;
+import cn.lunadeer.mc.mcp.server.websocket_gateway.session.SessionManager;
 import cn.lunadeer.mc.mcp.core.audit.AuditLogger;
 import cn.lunadeer.mc.mcp.core.execution.ExecutionChain;
 import cn.lunadeer.mc.mcp.core.execution.ExecutionEngine;
