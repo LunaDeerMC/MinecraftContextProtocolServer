@@ -44,7 +44,7 @@ ModelContextProtocolAgent/
 ├── sdk/                      # Maven-published SDK library
 │   ├── build.gradle.kts      # Maven publishing, signing, Sonatype upload
 │   └── src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/
-│       ├── annotations/      # @McpProvider, @McpAction, @McpContext, @McpEvent, @Param
+│       ├── annotations/      # @McpProvider, @McpAction, @McpContext, @McpEvent, @Param, @Result
 │       ├── api/              # McpAgent, McpProviderRegistry, McpEventEmitter
 │       ├── model/            # CapabilityManifest, RiskLevel, CapabilityType, ErrorCode
 │       └── util/             # JsonUtil, SchemaGenerator
@@ -79,6 +79,13 @@ ModelContextProtocolAgent/
         │   ├── schema/                        # SchemaValidator
         │   ├── permission/                    # PermissionChecker
         │   └── audit/                         # AuditLogger, AuditEvent
+        ├── http_sse/                          # HTTP SSE MCP server (MCP protocol)
+        │   ├── HttpMcpServer.java             # Main MCP HTTP server
+        │   ├── transport/                     # HttpSseTransport
+        │   ├── handler/                       # InitializeHandler, ToolsHandler, etc.
+        │   ├── lifecycle/                     # SessionManager, SessionInfo
+        │   ├── message/                       # JsonRpcMessage, JsonRpcRequest, etc.
+        │   └── tool/                          # McpTool, McpToolRequest, ToolDecorator
         ├── api/                               # Internal API implementations
         │   ├── McpAgentImpl.java              # McpAgent interface implementation
         │   ├── McpEventEmitterImpl.java       # Event emitter implementation
@@ -88,7 +95,8 @@ ModelContextProtocolAgent/
             ├── PlayerProvider.java            # Player-related capabilities
             ├── EntityProvider.java            # Entity-related capabilities
             ├── SystemProvider.java            # System-related capabilities
-            └── ChatProvider.java              # Chat-related capabilities
+            ├── ChatProvider.java              # Chat-related capabilities
+            └── BlockProvider.java             # Block-related capabilities
 ```
 
 ### Versioning System
@@ -113,6 +121,21 @@ public class Configuration extends ConfigurationFile {
     public static class WebsocketServer extends ConfigurationPart {
         @Comment("Host address")
         public String host = "127.0.0.1";
+        @Comment("Port for websocket server")
+        public int port = 8765;
+        @Comment("Secret key for connection")
+        public String authToken = "ChangeMe!";
+    }
+
+    public static class HttpSseMcpServer extends ConfigurationPart {
+        @Comment("Enable or disable the internal MCP server on start")
+        public boolean enableOnStart = false;
+        @Comment("Host address for internal MCP server")
+        public String host = "0.0.0.0";
+        @Comment("Port for internal MCP server")
+        public int port = 8766;
+        @Comment("Bearer token for internal MCP server authentication")
+        public String bearerToken = "ChangeMeToo!";
     }
 }
 
@@ -195,7 +218,8 @@ emitter.emit("player.join", Map.of("player", playerName));
    - Initializes infrastructure (Logger, Scheduler, Notification, I18n)
    - Loads configuration on enable via `ConfigurationManager`
    - Starts WebSocket server on configurable host/port
-   - Registers built-in providers (World, Player, Entity, System, Chat)
+   - Starts HTTP SSE MCP server (optional, for direct MCP client connections)
+   - Registers built-in providers (World, Player, Entity, System, Chat, Block)
    - Registers MCP Agent as Bukkit service for plugin access
    - Provides static `getInstance()` for singleton access
 
@@ -257,12 +281,23 @@ emitter.emit("player.join", Map.of("player", playerName));
    - `RequestMessageHandler` - Routes capability execution requests to ExecutionEngine
    - Handlers registered via `MessageRouter` in `AgentWebSocketServer`
 
-9. **Built-in Providers** ([core/src/main/java/.../provider/builtin/](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/provider/builtin/))
+9. **HTTP SSE MCP Server** ([core/src/main/java/.../http_sse/](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/http_sse/))
+   - `HttpMcpServer` - Main MCP HTTP server for direct MCP client connections
+   - `HttpSseTransport` - HTTP transport implementing MCP protocol
+   - `ToolsHandler` - Handles tools/list and tools/call requests
+   - `InitializeHandler` - Handles MCP initialization
+   - `InitializedHandler` - Handles MCP initialized state
+   - `ParameterConverter` - Converts JSON parameters to Java types
+   - `McpTool` / `McpToolRequest` / `McpToolResult` - Tool abstraction layer
+   - Supports standard MCP protocol for direct client connections (e.g., Claude Code)
+
+10. **Built-in Providers** ([core/src/main/java/.../provider/builtin/](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/provider/builtin/))
    - `WorldProvider` - World management, time, weather, chunk operations
    - `PlayerProvider` - Player info, inventory, teleportation, permissions
    - `EntityProvider` - Entity spawning, removal, modification
    - `SystemProvider` - Server info, performance metrics, plugin management
    - `ChatProvider` - Chat messaging, broadcast, formatting
+   - `BlockProvider` - Block info, setting, batch operations
    - All providers use `@McpProvider` and `@McpAction`/`@McpContext` annotations
 
 ### International & Textingualization
@@ -273,12 +308,21 @@ emitter.emit("player.join", Map.of("player", playerName));
 
 ### WebSocket Protocol Flow
 
-1. **Connection**: Client connects to WebSocket endpoint (default: `ws://127.0.0.1:8080`)
+1. **Connection**: Client connects to WebSocket endpoint (default: `ws://127.0.0.1:8765`)
 2. **Authentication**: Client sends `AuthRequest` with gateway ID and token
 3. **Capability Discovery**: Server responds with `AuthResponse` containing `CapabilityManifest` list
 4. **Heartbeat**: Server sends `HeartbeatMessage` periodically (configurable), client responds with `HeartbeatAck`
 5. **Request/Response**: Client sends `McpRequest`, server executes capability and returns `McpResponse`
 6. **Events**: Server broadcasts `McpEvent` to all authenticated sessions
+
+### HTTP SSE MCP Protocol Flow
+
+1. **Connection**: Client connects to HTTP endpoint (default: `http://0.0.0.0:8766/mcp`)
+2. **Authentication**: Client provides Bearer token in `Authorization` header
+3. **Initialization**: Client sends `initialize` request, server responds with capabilities
+4. **Tools List**: Client sends `tools/list` request to discover available capabilities
+5. **Tools Call**: Client sends `tools/call` request to execute a capability
+6. **Events**: Server can send SSE events to subscribed clients
 
 ### Message Types
 
@@ -346,6 +390,7 @@ Since this is a Minecraft plugin, integration tests require:
   - Adventure platform for Bukkit 4.3.3
   - Java-WebSocket 1.5.4
   - Jackson (via ConfigurationManager)
+  - Gson (for HTTP SSE MCP server)
 - **SDK**:
   - Paper API 1.20.1-R0.1-SNAPSHOT (compileOnly)
   - JUnit Jupiter 5.10.0 (test)
@@ -364,12 +409,13 @@ The plugin is marked as Folia-compatible in `plugin.yml`. The `Scheduler` abstra
 - Default language: `en_US` (configurable via `language` setting)
 
 ### Built-in Capabilities
-The plugin includes 5 built-in providers with ~20+ capabilities:
+The plugin includes 6 built-in providers with ~30+ capabilities:
 - **WorldProvider**: List worlds, get time/weather, set time/weather
 - **PlayerProvider**: List players, get player info, teleport, kick, ban
 - **EntityProvider**: Spawn entities, remove entities, get entity info
 - **SystemProvider**: Server info, performance metrics, plugin list
 - **ChatProvider**: Send messages, broadcast, clear chat
+- **BlockProvider**: Get block info, set blocks, batch operations
 
 ### External Dependencies
 When `buildFull=false` (default), these dependencies must be provided by the server:
@@ -393,6 +439,10 @@ When `buildFull=false` (default), these dependencies must be provided by the ser
 - **Execution engine**: [core/src/main/java/.../core/execution/ExecutionEngine.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/core/execution/ExecutionEngine.java)
 - **Message handlers**: [core/src/main/java/.../communication/handler/](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/communication/handler/)
 - **Built-in providers**: [core/src/main/java/.../provider/builtin/](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/provider/builtin/)
+- **HTTP SSE MCP Server**: [core/src/main/java/.../http_sse/HttpMcpServer.java](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/http_sse/HttpMcpServer.java)
+- **HTTP SSE handlers**: [core/src/main/java/.../http_sse/handler/](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/http_sse/handler/)
+- **HTTP SSE transport**: [core/src/main/java/.../http_sse/transport/](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/http_sse/transport/)
+- **HTTP SSE tools**: [core/src/main/java/.../http_sse/tool/](core/src/main/java/cn/lunadeer/mc/modelContextProtocolAgent/http_sse/tool/)
 
 ### SDK
 - **SDK main interface**: [sdk/src/main/java/.../api/McpAgent.java](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/api/McpAgent.java)
@@ -404,12 +454,37 @@ When `buildFull=false` (default), these dependencies must be provided by the ser
   - `@McpContext` - Method-level annotation for context capabilities
   - `@McpEvent` - Method-level annotation for event definitions
   - `@Param` - Parameter-level annotation for parameter metadata
+  - `@Result` - Record component annotation for return value metadata
 - **Capability manifest**: [sdk/src/main/java/.../model/CapabilityManifest.java](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/model/CapabilityManifest.java)
 - **Schema generator**: [sdk/src/main/java/.../util/SchemaGenerator.java](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/util/SchemaGenerator.java)
 - **Model classes**: [sdk/src/main/java/.../model/](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/model/)
   - `RiskLevel` - Risk classification for capabilities
   - `CapabilityType` - Type enum (CONTEXT, ACTION, EVENT)
   - `ErrorCode` - Standardized error codes
+- **Exceptions**: [sdk/src/main/java/.../exception/](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/exception/)
+  - `McpException` - Base exception
+  - `McpBusinessException` - Business logic errors
+  - `McpSecurityException` - Security-related errors
+  - `McpValidationException` - Parameter validation errors
+- **DTOs**: [sdk/src/main/java/.../model/dto/](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/model/dto/)
+  - `LocationParam` - Location data transfer object
+  - `PaginationParam` - Pagination parameters
+  - `PlayerInfo` - Player information
+  - `BlockInfo` - Block information
+  - `TpsResult` - TPS query result
+  - `TeleportResult` - Teleport operation result
+  - `KickResult` - Kick operation result
+  - `WeatherResult` - Weather query result
+  - `SetWeatherResult` - Weather set result
+  - `WorldTimeResult` - World time query result
+  - `SetTimeResult` - World time set result
+  - `WeatherType` - Weather type enum
+  - `DirectionType` - Block direction enum
+  - `BlockLocationParam` - Block location data transfer object
+  - `BlockSetting` - Block setting for batch operations
+  - `BlockListResult` - Block list with pagination
+- **Utilities**: [sdk/src/main/java/.../util/](sdk/src/main/java/cn/lunadeer/mc/modelContextProtocolAgentSDK/util/)
+  - `JsonUtil` - JSON serialization and deserialization utilities
 
 ### Build Configuration
 - **Root build**: [build.gradle.kts](build.gradle.kts) - Versioning, multi-module setup
