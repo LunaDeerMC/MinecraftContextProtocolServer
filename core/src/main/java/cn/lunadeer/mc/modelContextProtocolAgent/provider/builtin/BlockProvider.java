@@ -314,52 +314,85 @@ public class BlockProvider {
             filterMaterial = Material.getMaterial(materialFilter.toUpperCase());
         }
 
-        for (int x = minX; x <= maxX; x++) {
-            for (int y = minY; y <= maxY; y++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    Block block = world.getBlockAt(x, y, z);
-                    Material material = block.getType();
+        // Calculate chunk range
+        final int minChunkX = minX >> 4;
+        final int maxChunkX = maxX >> 4;
+        final int minChunkZ = minZ >> 4;
+        final int maxChunkZ = maxZ >> 4;
 
-                    if (material == Material.AIR) {
-                        continue;
-                    }
+        // Create a list of futures for chunk loading
+        List<CompletableFuture<Void>> chunkFutures = new ArrayList<>();
 
-                    if (filterMaterial != null && material != filterMaterial) {
-                        continue;
-                    }
+        for (int chunkX = minChunkX; chunkX <= maxChunkX; chunkX++) {
+            final int currentChunkX = chunkX;
+            for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; chunkZ++) {
+                final int currentChunkZ = chunkZ;
+                final Material finalFilterMaterial = filterMaterial;
+                CompletableFuture<Void> future = world.getChunkAtAsyncUrgently(currentChunkX, currentChunkZ)
+                        .thenAccept(chunk -> {
+                            // Process blocks within this chunk
+                            for (int x = minX; x <= maxX; x++) {
+                                for (int y = minY; y <= maxY; y++) {
+                                    for (int z = minZ; z <= maxZ; z++) {
+                                        // Check if this block is in the current chunk
+                                        int blockChunkX = x >> 4;
+                                        int blockChunkZ = z >> 4;
+                                        if (blockChunkX != currentChunkX || blockChunkZ != currentChunkZ) {
+                                            continue;
+                                        }
 
-                    BlockData blockData = block.getBlockData();
-                    String blockDataString = blockData.getAsString();
+                                        Block block = world.getBlockAt(x, y, z);
+                                        Material material = block.getType();
 
-                    // Get block state properties
-                    Map<String, String> properties = new HashMap<>();
-                    try {
-                        String[] parts = blockDataString.split("\\[");
-                        if (parts.length > 1) {
-                            String propsStr = parts[1].replace("]", "");
-                            String[] propPairs = propsStr.split(",");
-                            for (String pair : propPairs) {
-                                String[] keyValue = pair.split("=");
-                                if (keyValue.length == 2) {
-                                    properties.put(keyValue[0].trim(), keyValue[1].trim());
+                                        if (material == Material.AIR) {
+                                            continue;
+                                        }
+
+                                        if (finalFilterMaterial != null && material != finalFilterMaterial) {
+                                            continue;
+                                        }
+
+                                        BlockData blockData = block.getBlockData();
+                                        String blockDataString = blockData.getAsString();
+
+                                        // Get block state properties
+                                        Map<String, String> properties = new HashMap<>();
+                                        try {
+                                            String[] parts = blockDataString.split("\\[");
+                                            if (parts.length > 1) {
+                                                String propsStr = parts[1].replace("]", "");
+                                                String[] propPairs = propsStr.split(",");
+                                                for (String pair : propPairs) {
+                                                    String[] keyValue = pair.split("=");
+                                                    if (keyValue.length == 2) {
+                                                        properties.put(keyValue[0].trim(), keyValue[1].trim());
+                                                    }
+                                                }
+                                            }
+                                        } catch (Exception e) {
+                                            // Ignore parsing errors
+                                        }
+
+                                        BlockLocationParam locationParam = BlockLocationParam.create(worldName, x, y, z);
+                                        synchronized (blocks) {
+                                            blocks.add(new BlockInfo(
+                                                    locationParam,
+                                                    material.name(),
+                                                    blockDataString,
+                                                    properties,
+                                                    Integer.valueOf(block.getLightLevel())
+                                            ));
+                                        }
+                                    }
                                 }
                             }
-                        }
-                    } catch (Exception e) {
-                        // Ignore parsing errors
-                    }
-
-                    BlockLocationParam locationParam = BlockLocationParam.create(worldName, x, y, z);
-                    blocks.add(new BlockInfo(
-                            locationParam,
-                            material.name(),
-                            blockDataString,
-                            properties,
-                            Integer.valueOf(block.getLightLevel())
-                    ));
-                }
+                        });
+                chunkFutures.add(future);
             }
         }
+
+        // Wait for all chunks to be loaded
+        CompletableFuture.allOf(chunkFutures.toArray(new CompletableFuture[0])).join();
 
         // Apply pagination
         if (pagination == null) {
@@ -446,7 +479,7 @@ public class BlockProvider {
             );
         }
 
-        Material sourceMat = null;
+        Material sourceMat;
         if (sourceMaterial != null && !sourceMaterial.isEmpty()) {
             sourceMat = Material.getMaterial(sourceMaterial.toUpperCase());
             if (sourceMat == null) {
@@ -455,39 +488,42 @@ public class BlockProvider {
                         "Invalid source material: " + sourceMaterial
                 );
             }
+        } else {
+            sourceMat = null;
         }
 
-        int replacedCount = 0;
+        AtomicInteger replacedCount = new AtomicInteger();
         for (int x = minX; x <= maxX; x++) {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
-                    Block block = world.getBlockAt(x, y, z);
-                    Material material = block.getType();
+                    int finalX = x;
+                    int finalY = y;
+                    int finalZ = z;
+                    world.getChunkAtAsyncUrgently(x >> 4, z >> 4).thenAccept((chunk) -> {
+                        Block block = world.getBlockAt(finalX, finalY, finalZ);
+                        Material material = block.getType();
 
-                    if (material == Material.AIR) {
-                        continue;
-                    }
+                        if (material == Material.AIR) return;
+                        if (sourceMat != null && material != sourceMat) return;
 
-                    if (sourceMat != null && material != sourceMat) {
-                        continue;
-                    }
-
-                    try {
-                        if (targetBlockData != null && !targetBlockData.isEmpty()) {
-                            BlockData data = Bukkit.createBlockData(targetBlockData);
-                            block.setBlockData(data, update != null ? update : true);
-                        } else {
-                            block.setType(targetMat, update != null ? update : true);
+                        try {
+                            if (targetBlockData != null && !targetBlockData.isEmpty()) {
+                                BlockData data = Bukkit.createBlockData(targetBlockData);
+                                block.setBlockData(data, update != null ? update : true);
+                            } else {
+                                block.setType(targetMat, update != null ? update : true);
+                            }
+                            replacedCount.getAndIncrement();
+                        } catch (Exception e) {
+                            // Continue with other blocks
                         }
-                        replacedCount++;
-                    } catch (Exception e) {
-                        // Continue with other blocks
-                    }
+                    });
+
                 }
             }
         }
 
-        return replacedCount;
+        return replacedCount.get();
     }
 
     /**
@@ -539,20 +575,26 @@ public class BlockProvider {
             );
         }
 
-        int clearedCount = 0;
+        AtomicInteger clearedCount = new AtomicInteger();
         for (int x = minX; x <= maxX; x++) {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
-                    Block block = world.getBlockAt(x, y, z);
-                    if (block.getType() != Material.AIR) {
-                        block.setType(Material.AIR, update != null ? update : true);
-                        clearedCount++;
-                    }
+                    int finalX = x;
+                    int finalY = y;
+                    int finalZ = z;
+                    world.getChunkAtAsyncUrgently(x >> 4, z >> 4).thenAccept((chunk) -> {
+                        Block block = world.getBlockAt(finalX, finalY, finalZ);
+                        if (block.getType() != Material.AIR) {
+                            block.setType(Material.AIR, update != null ? update : true);
+                            clearedCount.getAndIncrement();
+                        }
+                    });
+
                 }
             }
         }
 
-        return clearedCount;
+        return clearedCount.get();
     }
 
     /**
@@ -579,9 +621,12 @@ public class BlockProvider {
                     "World not found: " + location.world()
             );
         }
-
-        Block block = world.getBlockAt(location.x(), location.y(), location.z());
-        return block.getType().name();
+        CompletableFuture<String> materialFuture = new CompletableFuture<>();
+        world.getChunkAtAsyncUrgently(BlockLocationParam.toBukkitLocation(location)).thenAccept((chunk) -> {
+            Block block = world.getBlockAt(location.x(), location.y(), location.z());
+            materialFuture.complete(block.getType().name());
+        });
+        return materialFuture.join();
     }
 
     /**
@@ -609,38 +654,13 @@ public class BlockProvider {
             );
         }
 
-        Block block = world.getBlockAt(location.x(), location.y(), location.z());
-        BlockData blockData = block.getBlockData();
-        return blockData.getAsString();
-    }
-
-    /**
-     * Gets the light level at a specific location.
-     *
-     * @param location the location to query
-     * @return the light level (0-15)
-     */
-    @McpContext(
-            id = "block.light.get",
-            name = "Get Block Light Level",
-            description = "Retrieves the light level at a specific location",
-            permissions = {"mcp.context.block.light"},
-            tags = {"block", "light", "query"}
-    )
-    public Integer getBlockLight(
-            @Param(name = "location", required = true, description = "The location to query")
-            BlockLocationParam location
-    ) {
-        World world = Bukkit.getWorld(location.world());
-        if (world == null) {
-            throw new McpBusinessException(
-                    ErrorCode.OPERATION_FAILED.getErrorCode(),
-                    "World not found: " + location.world()
-            );
-        }
-
-        Block block = world.getBlockAt(location.x(), location.y(), location.z());
-        return Integer.valueOf(block.getLightLevel());
+        CompletableFuture<String> dataFuture = new CompletableFuture<>();
+        world.getChunkAtAsyncUrgently(BlockLocationParam.toBukkitLocation(location)).thenAccept((chunk) -> {
+            Block block = world.getBlockAt(location.x(), location.y(), location.z());
+            BlockData blockData = block.getBlockData();
+            dataFuture.complete(blockData.getAsString());
+        });
+        return dataFuture.join();
     }
 
 }
