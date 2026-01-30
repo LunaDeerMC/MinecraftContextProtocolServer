@@ -1,6 +1,6 @@
 [submodule "sdk"]
 	path = sdk
-	url = https://github.com/LunaDeerMC/ModelContextProtocolAgentSDK.git
+	url = https://github.com/LunaDeerMC/MinecraftContextProtocolServerSDK.git
 [submodule "docs"]
 	path = docs
 	url = https://github.com/LunaDeerMC/mc-mcp-platform-doc.git

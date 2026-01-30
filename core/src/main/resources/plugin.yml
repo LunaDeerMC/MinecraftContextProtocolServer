@@ -1,20 +1,20 @@
-name: ModelContextProtocolAgent
+name: MinecraftContextProtocolServer
 version: @version@
-main: cn.lunadeer.mc.modelContextProtocolAgent.ModelContextProtocolAgent
+main: cn.lunadeer.mc.mcp.MinecraftContextProtocolServer
 api-version: '1.20'
 folia-supported: true
 libraries: [ ]
 
 commands:
   mcp:
-    description: MCP Agent admin command
+    description: MCP Server admin command
     usage: /<command> <subcommand>
     permission: mcp.admin
     aliases: [mcagent]
 
 permissions:
   mcp.admin:
-    description: MCP Agent admin permission
+    description: MCP Server admin permission
     default: op
     children:
       mcp.admin.status: true

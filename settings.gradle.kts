@@ -1,4 +1,4 @@
-rootProject.name = "ModelContextProtocolAgent"
+rootProject.name = "MinecraftContextProtocolServer"
 
 include(
     "sdk",
