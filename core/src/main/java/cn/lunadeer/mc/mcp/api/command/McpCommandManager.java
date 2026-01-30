@@ -38,7 +38,7 @@ public class McpCommandManager {
         commands.put("capabilities", new McpCapabilitiesCommand(plugin));
         commands.put("sessions", new McpSessionsCommand(plugin));
         commands.put("kick", new McpKickCommand(plugin));
-        commands.put("server", new McpServerCommand(plugin));
+        commands.put("ws", new McpWebsocketServerCommand(plugin));
 
         // Register commands with Bukkit
         for (Map.Entry<String, McpCommand> entry : commands.entrySet()) {
@@ -119,6 +119,6 @@ public class McpCommandManager {
         sender.sendMessage("§7/mcp capabilities §f- List registered capabilities");
         sender.sendMessage("§7/mcp sessions §f- List active sessions");
         sender.sendMessage("§7/mcp kick <id> §f- Kick a session");
-        sender.sendMessage("§7/mcp server <start|stop> §f- Control WebSocket server");
+        sender.sendMessage("§7/mcp ws <start|stop> §f- Control WebSocket server");
     }
 }

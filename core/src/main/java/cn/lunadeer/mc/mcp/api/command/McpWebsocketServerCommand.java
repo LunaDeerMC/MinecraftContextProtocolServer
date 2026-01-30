@@ -14,11 +14,11 @@ import java.util.List;
  * @author ZhangYuheng
  * @since 1.0.0
  */
-public class McpServerCommand extends McpCommand {
+public class McpWebsocketServerCommand extends McpCommand {
 
     private final MinecraftContextProtocolServer plugin;
 
-    public McpServerCommand(MinecraftContextProtocolServer plugin) {
+    public McpWebsocketServerCommand(MinecraftContextProtocolServer plugin) {
         this.plugin = plugin;
     }
 
@@ -30,7 +30,7 @@ public class McpServerCommand extends McpCommand {
         }
 
         if (args.length < 1) {
-            sendError(sender, "Usage: /mcp server <start|stop>");
+            sendError(sender, "Usage: /mcp ws <start|stop>");
             return false;
         }
 
@@ -43,7 +43,7 @@ public class McpServerCommand extends McpCommand {
                 return stopServer(sender);
             default:
                 sendError(sender, "Unknown subcommand: " + subCommand);
-                sendError(sender, "Usage: /mcp server <start|stop>");
+                sendError(sender, "Usage: /mcp ws <start|stop>");
                 return false;
         }
     }
