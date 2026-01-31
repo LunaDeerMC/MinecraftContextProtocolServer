@@ -29,10 +29,11 @@ Third-party plugins register capabilities using annotations. The system auto-dis
     description = "Provides custom capabilities"
 )
 public class MyProvider {
-    @McpContext(
+    @McpTool(
         id = "my-plugin.data.get",
         name = "Get Data",
         description = "Retrieves custom data",
+        type = McpTool.ToolType.CONTEXT,
         permissions = {"my-plugin.data.read"},
         tags = {"custom", "query"}
     )
@@ -43,10 +44,11 @@ public class MyProvider {
         // Implementation
     }
     
-    @McpAction(
+    @McpTool(
         id = "my-plugin.data.set",
         name = "Set Data",
         description = "Sets custom data",
+        type = McpTool.ToolType.ACTION,
         risk = RiskLevel.HIGH,
         snapshotRequired = true,
         rollbackSupported = true,
@@ -239,9 +241,8 @@ sdk/src/main/java/cn/lunadeer/mc/mcp/sdk/
 │   └── McpEventEmitter.java
 ├── annotations/                  # Annotation definitions
 │   ├── McpProvider.java
-│   ├── McpAction.java
+│   ├── McpTool.java
 │   ├── McpEvent.java
-│   ├── McpContext.java
 │   ├── Param.java
 │   └── Result.java
 ├── model/                        # Data models
@@ -371,7 +372,7 @@ public CompletableFuture<McpResponse> execute(McpRequest request, CallerInfo cal
 ### SDK Files
 - `sdk/src/main/java/cn/lunadeer/mcp/sdk/api/McpServer.java` - Main SDK API
 - `sdk/src/main/java/cn/lunadeer/mcp/sdk/annotations/McpProvider.java` - Provider annotation
-- `sdk/src/main/java/cn/lunadeer/mcp/sdk/annotations/McpAction.java` - Action annotation
+- `sdk/src/main/java/cn/lunadeer/mcp/sdk/annotations/McpTool.java` - Tool annotation
 
 ### Documentation
 - `docs/README.md` - Project overview and vision

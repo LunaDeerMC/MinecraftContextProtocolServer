@@ -1,8 +1,7 @@
 package cn.lunadeer.mc.mcp.builtin_provider;
 
-import cn.lunadeer.mc.mcp.sdk.annotations.McpAction;
-import cn.lunadeer.mc.mcp.sdk.annotations.McpContext;
 import cn.lunadeer.mc.mcp.sdk.annotations.McpProvider;
+import cn.lunadeer.mc.mcp.sdk.annotations.McpTool;
 import cn.lunadeer.mc.mcp.sdk.annotations.Param;
 import cn.lunadeer.mc.mcp.sdk.exception.McpBusinessException;
 import cn.lunadeer.mc.mcp.sdk.model.ErrorCode;
@@ -36,10 +35,11 @@ public class WorldProvider {
      * @param worldName the name of the world
      * @return the world time result
      */
-    @McpContext(
+    @McpTool(
             id = "world.time.get",
             name = "Get World Time",
             description = "Retrieves the current time of a world",
+            type = McpTool.ToolType.CONTEXT,
             permissions = {"mcp.context.world.time"},
             tags = {"world", "time", "query"}
     )
@@ -73,10 +73,11 @@ public class WorldProvider {
      * @param reason    optional reason for the change
      * @return the set time result
      */
-    @McpAction(
+    @McpTool(
             id = "world.time.set",
             name = "Set World Time",
             description = "Sets the current time of a world",
+            type = McpTool.ToolType.ACTION,
             risk = RiskLevel.HIGH,
             snapshotRequired = true,
             rollbackSupported = true,
@@ -111,10 +112,11 @@ public class WorldProvider {
      * @param worldName the name of the world
      * @return the weather result
      */
-    @McpContext(
+    @McpTool(
             id = "world.weather.get",
             name = "Get Weather",
             description = "Retrieves the current weather of a world",
+            type = McpTool.ToolType.CONTEXT,
             permissions = {"mcp.context.world.weather"},
             tags = {"world", "weather", "query"}
     )
@@ -152,10 +154,11 @@ public class WorldProvider {
      * @param duration  optional duration in ticks
      * @return the set weather result
      */
-    @McpAction(
+    @McpTool(
             id = "world.weather.set",
             name = "Set Weather",
             description = "Sets the weather of a world",
+            type = McpTool.ToolType.ACTION,
             risk = RiskLevel.MEDIUM,
             permissions = {"mcp.action.world.weather"},
             tags = {"world", "weather", "modify"}
@@ -215,10 +218,11 @@ public class WorldProvider {
      *
      * @return the TPS result
      */
-    @McpContext(
+    @McpTool(
             id = "world.tps.get",
             name = "Get TPS",
             description = "Retrieves the server's TPS (Ticks Per Second) metrics",
+            type = McpTool.ToolType.CONTEXT,
             permissions = {"mcp.context.world.tps"},
             tags = {"world", "performance", "query"}
     )
@@ -239,10 +243,11 @@ public class WorldProvider {
      * @param rule      the game rule name
      * @return the game rule value
      */
-    @McpContext(
+    @McpTool(
             id = "world.rule.get",
             name = "Get Game Rule",
             description = "Retrieves a game rule value from a world",
+            type = McpTool.ToolType.CONTEXT,
             permissions = {"mcp.context.world.rule"},
             tags = {"world", "rule", "query"}
     )
@@ -279,10 +284,11 @@ public class WorldProvider {
      * @param value     the game rule value
      * @return true if successful
      */
-    @McpAction(
+    @McpTool(
             id = "world.rule.set",
             name = "Set Game Rule",
             description = "Sets a game rule value in a world",
+            type = McpTool.ToolType.ACTION,
             risk = RiskLevel.HIGH,
             snapshotRequired = true,
             rollbackSupported = true,

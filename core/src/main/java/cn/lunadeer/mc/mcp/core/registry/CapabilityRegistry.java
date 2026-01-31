@@ -3,10 +3,9 @@ package cn.lunadeer.mc.mcp.core.registry;
 import cn.lunadeer.mc.mcp.infrastructure.I18n;
 import cn.lunadeer.mc.mcp.infrastructure.XLogger;
 import cn.lunadeer.mc.mcp.infrastructure.configuration.ConfigurationPart;
-import cn.lunadeer.mc.mcp.sdk.annotations.McpAction;
-import cn.lunadeer.mc.mcp.sdk.annotations.McpContext;
 import cn.lunadeer.mc.mcp.sdk.annotations.McpEvent;
 import cn.lunadeer.mc.mcp.sdk.annotations.McpProvider;
+import cn.lunadeer.mc.mcp.sdk.annotations.McpTool;
 import cn.lunadeer.mc.mcp.sdk.api.McpProviderRegistry;
 import cn.lunadeer.mc.mcp.sdk.model.CapabilityManifest;
 import cn.lunadeer.mc.mcp.sdk.model.CapabilityType;
@@ -227,18 +226,12 @@ public class CapabilityRegistry implements McpProviderRegistry {
         Class<?> providerClass = providerInstance.getClass();
 
         for (Method method : providerClass.getDeclaredMethods()) {
-            // Check for @McpContext
-            McpContext contextAnnotation = method.getAnnotation(McpContext.class);
-            if (contextAnnotation != null) {
+            // Check for @McpTool
+            McpTool toolAnnotation = method.getAnnotation(McpTool.class);
+            if (toolAnnotation != null) {
+                CapabilityType type = CapabilityType.TOOL;
                 capabilities.add(createCapabilityDescriptor(
-                        providerInstance, providerId, method, contextAnnotation, CapabilityType.CONTEXT));
-            }
-
-            // Check for @McpAction
-            McpAction actionAnnotation = method.getAnnotation(McpAction.class);
-            if (actionAnnotation != null) {
-                capabilities.add(createCapabilityDescriptor(
-                        providerInstance, providerId, method, actionAnnotation, CapabilityType.ACTION));
+                        providerInstance, providerId, method, toolAnnotation, type));
             }
 
             // Check for @McpEvent
@@ -283,28 +276,19 @@ public class CapabilityRegistry implements McpProviderRegistry {
         int cacheTtl = 60;
 
         // Extract common fields from annotation
-        if (annotation instanceof McpContext context) {
-            id = context.id();
-            name = context.name();
-            description = context.description();
-            version = context.version();
-            permissions = Arrays.asList(context.permissions());
-            tags = Arrays.asList(context.tags());
-            cacheable = context.cacheable();
-            cacheTtl = context.cacheTtl();
-        } else if (annotation instanceof McpAction action) {
-            id = action.id();
-            name = action.name();
-            description = action.description();
-            version = action.version();
-            permissions = Arrays.asList(action.permissions());
-            tags = Arrays.asList(action.tags());
-            riskLevel = action.risk();
-            rollbackSupported = action.rollbackSupported();
-            snapshotRequired = action.snapshotRequired();
-            confirmRequired = action.confirmRequired();
-            cacheable = false; // Actions are not cacheable
-            cacheTtl = 0;
+        if (annotation instanceof McpTool tool) {
+            id = tool.id();
+            name = tool.name();
+            description = tool.description();
+            version = tool.version();
+            permissions = Arrays.asList(tool.permissions());
+            tags = Arrays.asList(tool.tags());
+            riskLevel = tool.risk();
+            rollbackSupported = tool.rollbackSupported();
+            snapshotRequired = tool.snapshotRequired();
+            confirmRequired = tool.confirmRequired();
+            cacheable = tool.cacheable();
+            cacheTtl = tool.cacheTtl();
         } else if (annotation instanceof McpEvent event) {
             id = event.id();
             name = event.name();

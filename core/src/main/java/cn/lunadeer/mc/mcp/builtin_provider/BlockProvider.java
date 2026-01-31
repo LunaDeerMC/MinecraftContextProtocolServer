@@ -1,8 +1,7 @@
 package cn.lunadeer.mc.mcp.builtin_provider;
 
-import cn.lunadeer.mc.mcp.sdk.annotations.McpAction;
-import cn.lunadeer.mc.mcp.sdk.annotations.McpContext;
 import cn.lunadeer.mc.mcp.sdk.annotations.McpProvider;
+import cn.lunadeer.mc.mcp.sdk.annotations.McpTool;
 import cn.lunadeer.mc.mcp.sdk.annotations.Param;
 import cn.lunadeer.mc.mcp.sdk.exception.McpBusinessException;
 import cn.lunadeer.mc.mcp.sdk.model.ErrorCode;
@@ -50,10 +49,11 @@ public class BlockProvider {
      * @param location the location to query
      * @return the block information
      */
-    @McpContext(
+    @McpTool(
             id = "block.info.get",
             name = "Get Block Info",
             description = "Retrieves information about a block at a specific location",
+            type = McpTool.ToolType.CONTEXT,
             permissions = {"mcp.context.block.info"},
             tags = {"block", "info", "query"}
     )
@@ -132,10 +132,11 @@ public class BlockProvider {
      * @param update    whether to update neighboring blocks
      * @return true if successful
      */
-    @McpAction(
+    @McpTool(
             id = "block.set",
             name = "Set Block",
             description = "Sets a block at a specific location",
+            type = McpTool.ToolType.ACTION,
             risk = RiskLevel.HIGH,
             snapshotRequired = true,
             rollbackSupported = true,
@@ -201,10 +202,11 @@ public class BlockProvider {
      * @param update whether to update neighboring blocks
      * @return the number of blocks set successfully
      */
-    @McpAction(
+    @McpTool(
             id = "block.set.batch",
             name = "Set Blocks (Batch)",
             description = "Sets multiple blocks at specified locations",
+            type = McpTool.ToolType.ACTION,
             risk = RiskLevel.HIGH,
             snapshotRequired = true,
             rollbackSupported = true,
@@ -273,10 +275,11 @@ public class BlockProvider {
      * @param pagination     optional pagination parameters
      * @return the list of block information
      */
-    @McpContext(
+    @McpTool(
             id = "block.list.area",
             name = "List Blocks in Area",
             description = "Gets blocks in a specified area",
+            type = McpTool.ToolType.CONTEXT,
             permissions = {"mcp.context.block.list.area"},
             tags = {"block", "list", "area", "query"}
     )
@@ -429,10 +432,11 @@ public class BlockProvider {
      * @param update          whether to update neighboring blocks
      * @return the number of blocks replaced
      */
-    @McpAction(
+    @McpTool(
             id = "block.replace.area",
             name = "Replace Blocks in Area",
             description = "Replaces blocks in a specified area with another block",
+            type = McpTool.ToolType.ACTION,
             risk = RiskLevel.HIGH,
             snapshotRequired = true,
             rollbackSupported = true,
@@ -539,10 +543,11 @@ public class BlockProvider {
      * @param update    whether to update neighboring blocks
      * @return the number of blocks cleared
      */
-    @McpAction(
+    @McpTool(
             id = "block.clear.area",
             name = "Clear Blocks in Area",
             description = "Clears blocks in a specified area (sets to air)",
+            type = McpTool.ToolType.ACTION,
             risk = RiskLevel.HIGH,
             snapshotRequired = true,
             rollbackSupported = true,
@@ -603,10 +608,11 @@ public class BlockProvider {
      * @param location the location to query
      * @return the material name
      */
-    @McpContext(
+    @McpTool(
             id = "block.material.get",
             name = "Get Block Material",
             description = "Retrieves the material of a block at a specific location",
+            type = McpTool.ToolType.CONTEXT,
             permissions = {"mcp.context.block.material"},
             tags = {"block", "material", "query"}
     )
@@ -635,10 +641,11 @@ public class BlockProvider {
      * @param location the location to query
      * @return the block data string
      */
-    @McpContext(
+    @McpTool(
             id = "block.data.get",
             name = "Get Block Data",
             description = "Retrieves the block data of a block at a specific location",
+            type = McpTool.ToolType.CONTEXT,
             permissions = {"mcp.context.block.data"},
             tags = {"block", "data", "query"}
     )

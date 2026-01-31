@@ -1,8 +1,7 @@
 package cn.lunadeer.mc.mcp.builtin_provider;
 
-import cn.lunadeer.mc.mcp.sdk.annotations.McpAction;
-import cn.lunadeer.mc.mcp.sdk.annotations.McpContext;
 import cn.lunadeer.mc.mcp.sdk.annotations.McpProvider;
+import cn.lunadeer.mc.mcp.sdk.annotations.McpTool;
 import cn.lunadeer.mc.mcp.sdk.annotations.Param;
 import cn.lunadeer.mc.mcp.sdk.exception.McpBusinessException;
 import cn.lunadeer.mc.mcp.sdk.model.ErrorCode;
@@ -47,10 +46,11 @@ public class EntityProvider {
      * @param pagination optional pagination parameters
      * @return the list of entities
      */
-    @McpContext(
+    @McpTool(
             id = "entity.list",
             name = "List Entities",
             description = "Lists entities in a world with optional filtering",
+            type = McpTool.ToolType.CONTEXT,
             permissions = {"mcp.context.entity.list"},
             tags = {"entity", "list", "query"}
     )
@@ -121,10 +121,11 @@ public class EntityProvider {
      * @param excludePlayers whether to exclude players
      * @return the number of entities removed
      */
-    @McpAction(
+    @McpTool(
             id = "entity.remove",
             name = "Remove Entities",
             description = "Removes entities from a world",
+            type = McpTool.ToolType.ACTION,
             risk = RiskLevel.HIGH,
             snapshotRequired = true,
             rollbackSupported = true,

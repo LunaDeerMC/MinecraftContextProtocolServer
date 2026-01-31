@@ -1,8 +1,7 @@
 package cn.lunadeer.mc.mcp.builtin_provider;
 
-import cn.lunadeer.mc.mcp.sdk.annotations.McpAction;
-import cn.lunadeer.mc.mcp.sdk.annotations.McpContext;
 import cn.lunadeer.mc.mcp.sdk.annotations.McpProvider;
+import cn.lunadeer.mc.mcp.sdk.annotations.McpTool;
 import cn.lunadeer.mc.mcp.sdk.annotations.Param;
 import cn.lunadeer.mc.mcp.sdk.exception.McpBusinessException;
 import cn.lunadeer.mc.mcp.sdk.model.ErrorCode;
@@ -48,10 +47,11 @@ public class PlayerProvider {
      * @param pagination optional pagination parameters
      * @return the player list result
      */
-    @McpContext(
+    @McpTool(
             id = "player.list",
             name = "Get Player List",
             description = "Retrieves a list of online players with pagination",
+            type = McpTool.ToolType.CONTEXT,
             permissions = {"mcp.context.player.list"},
             tags = {"player", "list", "query"}
     )
@@ -92,10 +92,11 @@ public class PlayerProvider {
      * @param uuid       optional player UUID
      * @return the player info
      */
-    @McpContext(
+    @McpTool(
             id = "player.info.get",
             name = "Get Player Info",
             description = "Retrieves detailed information about a player",
+            type = McpTool.ToolType.CONTEXT,
             permissions = {"mcp.context.player.info"},
             tags = {"player", "info", "query"}
     )
@@ -124,10 +125,11 @@ public class PlayerProvider {
      * @param reason     optional reason for teleport
      * @return the teleport result
      */
-    @McpAction(
+    @McpTool(
             id = "player.teleport",
             name = "Teleport Player",
             description = "Teleports a player to a specified location",
+            type = McpTool.ToolType.ACTION,
             risk = RiskLevel.MEDIUM,
             rollbackSupported = true,
             permissions = {"mcp.action.player.teleport"},
@@ -168,10 +170,11 @@ public class PlayerProvider {
      * @param reason     optional kick reason
      * @return the kick result
      */
-    @McpAction(
+    @McpTool(
             id = "player.kick",
             name = "Kick Player",
             description = "Kicks a player from the server",
+            type = McpTool.ToolType.ACTION,
             risk = RiskLevel.MEDIUM,
             permissions = {"mcp.action.player.kick"},
             tags = {"player", "kick", "modify"}

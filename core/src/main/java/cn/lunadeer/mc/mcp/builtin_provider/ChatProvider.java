@@ -1,7 +1,7 @@
 package cn.lunadeer.mc.mcp.builtin_provider;
 
-import cn.lunadeer.mc.mcp.sdk.annotations.McpAction;
 import cn.lunadeer.mc.mcp.sdk.annotations.McpProvider;
+import cn.lunadeer.mc.mcp.sdk.annotations.McpTool;
 import cn.lunadeer.mc.mcp.sdk.annotations.Param;
 import cn.lunadeer.mc.mcp.sdk.exception.McpBusinessException;
 import cn.lunadeer.mc.mcp.sdk.model.ErrorCode;
@@ -35,10 +35,11 @@ public class ChatProvider {
      * @param color      the color code (optional)
      * @return true if successful
      */
-    @McpAction(
+    @McpTool(
             id = "chat.send.player",
             name = "Send Message to Player",
             description = "Sends a message to a specific player",
+            type = McpTool.ToolType.ACTION,
             risk = RiskLevel.LOW,
             permissions = {"mcp.action.chat.send.player"},
             tags = {"chat", "message", "send"}
@@ -71,10 +72,11 @@ public class ChatProvider {
      * @param color   the color code (optional)
      * @return true if successful
      */
-    @McpAction(
+    @McpTool(
             id = "chat.broadcast",
             name = "Broadcast Message",
             description = "Broadcasts a message to all players",
+            type = McpTool.ToolType.ACTION,
             risk = RiskLevel.MEDIUM,
             permissions = {"mcp.action.chat.broadcast"},
             tags = {"chat", "message", "broadcast"}
@@ -97,10 +99,11 @@ public class ChatProvider {
      * @param message    the message to send
      * @return true if successful
      */
-    @McpAction(
+    @McpTool(
             id = "chat.send.actionbar",
             name = "Send Action Bar Message",
             description = "Sends an action bar message to a player",
+            type = McpTool.ToolType.ACTION,
             risk = RiskLevel.LOW,
             permissions = {"mcp.action.chat.send.actionbar"},
             tags = {"chat", "message", "actionbar"}

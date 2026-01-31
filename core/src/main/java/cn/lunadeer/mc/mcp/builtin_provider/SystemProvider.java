@@ -1,7 +1,7 @@
 package cn.lunadeer.mc.mcp.builtin_provider;
 
-import cn.lunadeer.mc.mcp.sdk.annotations.McpAction;
 import cn.lunadeer.mc.mcp.sdk.annotations.McpProvider;
+import cn.lunadeer.mc.mcp.sdk.annotations.McpTool;
 import cn.lunadeer.mc.mcp.sdk.annotations.Param;
 import cn.lunadeer.mc.mcp.sdk.exception.McpBusinessException;
 import cn.lunadeer.mc.mcp.sdk.model.ErrorCode;
@@ -34,10 +34,11 @@ public class SystemProvider {
      * @param description optional description of the backup
      * @return the backup result
      */
-    @McpAction(
+    @McpTool(
             id = "system.backup",
             name = "Create Backup",
             description = "Creates a backup of the specified worlds",
+            type = McpTool.ToolType.ACTION,
             risk = RiskLevel.HIGH,
             permissions = {"mcp.action.system.backup"},
             tags = {"system", "backup", "modify"}
@@ -71,10 +72,11 @@ public class SystemProvider {
      * @param confirm  confirmation flag (must be true)
      * @return the restore result
      */
-    @McpAction(
+    @McpTool(
             id = "system.restore",
             name = "Restore Backup",
             description = "Restores a backup",
+            type = McpTool.ToolType.ACTION,
             risk = RiskLevel.CRITICAL,
             snapshotRequired = true,
             permissions = {"mcp.action.system.restore"},
@@ -106,10 +108,11 @@ public class SystemProvider {
      * @param pluginName optional plugin name to reload
      * @return the reload result
      */
-    @McpAction(
+    @McpTool(
             id = "system.reload",
             name = "Reload Plugin",
             description = "Reloads a plugin or all plugins",
+            type = McpTool.ToolType.ACTION,
             risk = RiskLevel.HIGH,
             permissions = {"mcp.action.system.reload"},
             tags = {"system", "reload", "modify"}

@@ -26,7 +26,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 #### SDK Module (`sdk/`)
 - **Public API**: `McpServer`, `McpProviderRegistry`, `McpEventEmitter`
-- **Annotations**: `@McpProvider`, `@McpAction`, `@McpEvent`, `@McpContext`
+- **Annotations**: `@McpProvider`, `@McpTool`, `@McpEvent`
 - **Data Models**: DTOs for all operations
 - **Exception Hierarchy**: `McpException`, `McpBusinessException`, `McpSecurityException`, `McpValidationException`
 
@@ -125,9 +125,8 @@ sdk/src/main/java/cn/lunadeer/mc/mcp/sdk/
 │   └── McpEventEmitter.java
 ├── annotations/                  # Annotation definitions
 │   ├── McpProvider.java
-│   ├── McpAction.java
+│   ├── McpTool.java
 │   ├── McpEvent.java
-│   ├── McpContext.java
 │   ├── Param.java
 │   └── Result.java
 ├── model/                        # Data models
@@ -172,7 +171,7 @@ Third-party plugins can register capabilities via the SDK:
 ```java
 @McpProvider(name = "my_provider")
 public class MyProvider {
-    @McpAction(name = "my_action", risk = RiskLevel.LOW)
+    @McpTool(id = "my_action", name = "my_action", type = McpTool.ToolType.ACTION, risk = RiskLevel.LOW)
     public MyResult myAction(MyParam param) {
         // Implementation
     }
@@ -206,7 +205,7 @@ Minecraft events → MCP events → Gateway push notifications
 ### SDK Files
 - `sdk/src/main/java/cn/lunadeer/mcp/sdk/api/McpServer.java` - Main SDK API
 - `sdk/src/main/java/cn/lunadeer/mcp/sdk/annotations/McpProvider.java` - Provider annotation
-- `sdk/src/main/java/cn/lunadeer/mcp/sdk/annotations/McpAction.java` - Action annotation
+- `sdk/src/main/java/cn/lunadeer/mcp/sdk/annotations/McpTool.java` - Tool annotation
 
 ## Version Management
 

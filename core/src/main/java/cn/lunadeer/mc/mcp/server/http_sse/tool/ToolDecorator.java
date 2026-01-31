@@ -125,9 +125,9 @@ public class ToolDecorator {
         CapabilityType type = descriptor.getType();
         
         // Based on capability type, set appropriate annotations
-        boolean readOnlyHint = type == CapabilityType.CONTEXT;
-        boolean destructiveHint = type == CapabilityType.ACTION;
-        boolean idempotentHint = type != CapabilityType.ACTION; // CONTEXT and EVENT are idempotent
+        boolean readOnlyHint = type == CapabilityType.TOOL;
+        boolean destructiveHint = false; // TOOL can be either read or write, but we don't know here
+        boolean idempotentHint = type == CapabilityType.TOOL; // TOOL and EVENT are idempotent
         McpTool.ToolAnnotations.OpenWorldHint openWorldHint = McpTool.ToolAnnotations.OpenWorldHint.UNKNOWN;
         boolean localOnlyHint = true; // Most Minecraft capabilities are local
         
@@ -151,11 +151,8 @@ public class ToolDecorator {
         CapabilityType type = descriptor.getType();
         
         switch (type) {
-            case CONTEXT:
-                iconSrc = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><text y='20' font-size='20'>🔍</text></svg>";
-                break;
-            case ACTION:
-                iconSrc = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><text y='20' font-size='20'>⚡</text></svg>";
+            case TOOL:
+                iconSrc = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><text y='20' font-size='20'>🔧</text></svg>";
                 break;
             case EVENT:
                 iconSrc = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><text y='20' font-size='20'>🔔</text></svg>";

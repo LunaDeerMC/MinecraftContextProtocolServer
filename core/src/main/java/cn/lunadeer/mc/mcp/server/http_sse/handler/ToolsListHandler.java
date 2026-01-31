@@ -126,8 +126,8 @@ public class ToolsListHandler {
             ProviderDescriptor provider = capabilityRegistry.getProviderDescriptor(providerId);
             if (provider != null) {
                 provider.getCapabilities().forEach(capability -> {
-                    // Only include ACTION & CONTEXT type capabilities as tools
-                    if (capability.getType() == CapabilityType.ACTION || capability.getType() == CapabilityType.CONTEXT) {
+                    // Only include TOOL type capabilities as tools
+                    if (capability.getType() == CapabilityType.TOOL) {
                         allDescriptors.add(capability);
                     }
                 });

@@ -77,18 +77,14 @@ public class McpStatusCommand extends McpCommand {
         sendMessage(sender, "§7Registered Capabilities: §f" + capabilities.size());
 
         // Show capability counts by type
-        long contexts = capabilities.stream()
-                .filter(c -> c.getType() == CapabilityType.CONTEXT)
-                .count();
-        long actions = capabilities.stream()
-                .filter(c -> c.getType() == CapabilityType.ACTION)
+        long tools = capabilities.stream()
+                .filter(c -> c.getType() == CapabilityType.TOOL)
                 .count();
         long events = capabilities.stream()
                 .filter(c -> c.getType() == CapabilityType.EVENT)
                 .count();
 
-        sendMessage(sender, "§7  Contexts: §f" + contexts);
-        sendMessage(sender, "§7  Actions: §f" + actions);
+        sendMessage(sender, "§7  Tools: §f" + tools);
         sendMessage(sender, "§7  Events: §f" + events);
 
         return true;
